@@ -14,4 +14,5 @@ export 'display.dart';
 export 'feedback.dart';
 export 'format.dart';
 export 'inputs.dart';
+export 'sparkline.dart';
 export 'tokens.dart';

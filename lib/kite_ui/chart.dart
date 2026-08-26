@@ -7,10 +7,18 @@ import 'tokens.dart';
 /// grid, no axis furniture competing with the data, an area fill, and colours
 /// taken from the theme so it reads in both light and dark.
 class KiteLineChart extends StatelessWidget {
-  const KiteLineChart({super.key, required this.spots, this.showArea = true});
+  const KiteLineChart({
+    super.key,
+    required this.spots,
+    this.showArea = true,
+    this.valueLabel,
+  });
 
   final List<(double, double)> spots;
   final bool showArea;
+
+  /// Formats the hover tooltip. Defaults to one decimal place.
+  final String Function(double)? valueLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +57,42 @@ class KiteLineChart extends StatelessWidget {
           ),
         ),
         borderData: FlBorderData(show: false),
+        // Without this, hovering prints the raw double — 74.81973839205.
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (_) => c.foreground,
+            tooltipBorderRadius: BorderRadius.circular(6),
+            tooltipPadding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 6,
+            ),
+            getTooltipItems: (spots) => [
+              for (final s in spots)
+                LineTooltipItem(
+                  valueLabel?.call(s.y) ?? s.y.toStringAsFixed(1),
+                  TextStyle(
+                    color: c.background,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+            ],
+          ),
+          getTouchedSpotIndicator: (bar, indexes) => [
+            for (final _ in indexes)
+              TouchedSpotIndicatorData(
+                FlLine(color: c.border, strokeWidth: 1),
+                FlDotData(
+                  getDotPainter: (_, _, _, _) => FlDotCirclePainter(
+                    radius: 3.5,
+                    color: c.primary,
+                    strokeWidth: 2,
+                    strokeColor: c.card,
+                  ),
+                ),
+              ),
+          ],
+        ),
         lineBarsData: [
           LineChartBarData(
             spots: [for (final (x, y) in spots) FlSpot(x, y)],
