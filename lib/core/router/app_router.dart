@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/auth_screens.dart';
+import '../../features/components/components_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/forms/forms_screen.dart';
 import '../../features/resources/resource_list_screen.dart';
@@ -64,6 +65,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: R.products,
             builder: (_, _) => const ResourceListScreen(resource: 'products'),
+          ),
+          GoRoute(
+            path: R.components,
+            builder: (_, _) => const ComponentsScreen(),
           ),
           GoRoute(path: R.forms, builder: (_, _) => const FormsScreen()),
           GoRoute(path: R.settings, builder: (_, _) => const SettingsScreen()),

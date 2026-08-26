@@ -67,11 +67,15 @@ class KiteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // `enabled` must reach ShadButton, not just gate onPressed — it is what
+    // dims the button. Nulling the callback alone leaves a disabled control
+    // looking identical to an active one.
     final press = enabled ? onPressed : null;
     final width = expands ? double.infinity : null;
     return switch (variant) {
       KiteButtonVariant.primary => ShadButton(
         onPressed: press,
+        enabled: enabled,
         leading: leading,
         trailing: trailing,
         width: width,
@@ -79,6 +83,7 @@ class KiteButton extends StatelessWidget {
       ),
       KiteButtonVariant.secondary => ShadButton.secondary(
         onPressed: press,
+        enabled: enabled,
         leading: leading,
         trailing: trailing,
         width: width,
@@ -86,6 +91,7 @@ class KiteButton extends StatelessWidget {
       ),
       KiteButtonVariant.outline => ShadButton.outline(
         onPressed: press,
+        enabled: enabled,
         leading: leading,
         trailing: trailing,
         width: width,
@@ -93,6 +99,7 @@ class KiteButton extends StatelessWidget {
       ),
       KiteButtonVariant.ghost => ShadButton.ghost(
         onPressed: press,
+        enabled: enabled,
         leading: leading,
         trailing: trailing,
         width: width,
@@ -100,12 +107,17 @@ class KiteButton extends StatelessWidget {
       ),
       KiteButtonVariant.destructive => ShadButton.destructive(
         onPressed: press,
+        enabled: enabled,
         leading: leading,
         trailing: trailing,
         width: width,
         child: child,
       ),
-      KiteButtonVariant.link => ShadButton.link(onPressed: press, child: child),
+      KiteButtonVariant.link => ShadButton.link(
+        onPressed: press,
+        enabled: enabled,
+        child: child,
+      ),
     };
   }
 }

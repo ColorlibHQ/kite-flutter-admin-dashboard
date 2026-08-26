@@ -30,6 +30,13 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const KiteAlert(
+            title: 'Low stock on 3 products',
+            description:
+                'Reorder before Friday to avoid backorders over the weekend.',
+            tone: KiteTone.warning,
+          ),
+          const SizedBox(height: KiteSpace.xl),
           const _StatRow(),
           const SizedBox(height: KiteSpace.xl),
           if (wide)
@@ -128,44 +135,13 @@ class _ChannelsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = KiteColors.of(context);
-    final t = KiteText.of(context);
     return KiteCard(
       title: 'Traffic by channel',
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           for (final (label, share) in _channels)
-            Padding(
-              padding: const EdgeInsets.only(bottom: KiteSpace.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text(label, style: t.small)),
-                      Text(
-                        '${(share * 100).round()}%',
-                        style: t.small.copyWith(
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                          color: c.mutedForeground,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: KiteSpace.sm),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: share,
-                      minHeight: 6,
-                      backgroundColor: c.muted,
-                      valueColor: AlwaysStoppedAnimation(c.primary),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            KiteMeter(label: label, value: share),
         ],
       ),
     );

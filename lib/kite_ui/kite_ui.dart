@@ -10,5 +10,8 @@ export 'button.dart';
 export 'card.dart';
 export 'chart.dart';
 export 'data_table.dart';
+export 'display.dart';
+export 'feedback.dart';
 export 'format.dart';
+export 'inputs.dart';
 export 'tokens.dart';

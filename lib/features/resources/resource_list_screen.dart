@@ -116,6 +116,13 @@ class ResourceListScreen extends ConsumerWidget {
                     Expanded(
                       child: KiteDataTable(
                         paginate: false,
+                        onRowTap: (i) => _openDetail(
+                          context,
+                          ref,
+                          resource: resource,
+                          schema: schema,
+                          row: result.rows[i],
+                        ),
                         columns: [
                           for (final (field, title, kind) in schema)
                             TrinaColumn(
@@ -157,6 +164,95 @@ class ResourceListScreen extends ConsumerWidget {
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Row detail drawer.
+///
+/// Double-tap a row to inspect it without losing your place in the table, then
+/// act on it from there. Deleting asks first and says so afterwards — a control
+/// that says what it will do, then a message confirming it did.
+void _openDetail(
+  BuildContext context,
+  WidgetRef ref, {
+  required String resource,
+  required List<(String, String, ColKind)> schema,
+  required JsonMap row,
+}) {
+  final label = '${row[schema.first.$1]}';
+  kiteSheet<void>(
+    context,
+    title: label,
+    description: 'Double-tapped from the $resource table.',
+    body: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final (field, title, kind) in schema)
+          _DetailRow(
+            label: title,
+            value: switch (kind) {
+              ColKind.money => KiteFormat.money(row[field]),
+              ColKind.number => KiteFormat.count(row[field]),
+              ColKind.text => '${row[field]}',
+            },
+          ),
+      ],
+    ),
+    actions: [
+      KiteButton.outline(
+        onPressed: () {
+          Navigator.of(context).pop();
+          KiteToast.show(
+            context,
+            title: 'Nothing to edit yet',
+            description: 'Create and edit screens land in the next phase.',
+          );
+        },
+        child: const Text('Edit'),
+      ),
+      KiteButton.destructive(
+        onPressed: () async {
+          final ok = await kiteConfirm(
+            context,
+            title: 'Delete $label?',
+            message:
+                'This removes the record permanently and cannot be undone.',
+          );
+          if (!ok || !context.mounted) return;
+          await ref.read(dataProvider).delete(resource, '${row['id']}');
+          if (!context.mounted) return;
+          Navigator.of(context).pop();
+          ref.invalidate(_listProvider(resource));
+          KiteToast.show(
+            context,
+            title: '$label deleted',
+            tone: KiteTone.danger,
+          );
+        },
+        child: const Text('Delete'),
+      ),
+    ],
+  );
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = KiteText.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: KiteSpace.sm),
+      child: Row(
+        children: [
+          SizedBox(width: 120, child: Text(label, style: t.muted)),
+          Expanded(child: Text(value, style: t.p.copyWith(fontSize: 14))),
         ],
       ),
     );
@@ -227,8 +323,25 @@ class _Toolbar extends ConsumerWidget {
           ),
         KiteButton.ghost(
           leading: const Icon(Icons.refresh, size: 16),
-          onPressed: () => ref.invalidate(_listProvider(resource)),
+          onPressed: () {
+            ref.invalidate(_listProvider(resource));
+            KiteToast.show(context, title: 'Refreshed');
+          },
           child: const Text('Refresh'),
+        ),
+        KiteButton.outline(
+          leading: const Icon(Icons.download, size: 16),
+          onPressed: () => KiteToast.show(
+            context,
+            title: 'Export queued',
+            description: 'You will get an email when the CSV is ready.',
+            tone: KiteTone.success,
+          ),
+          child: const Text('Export'),
+        ),
+        KiteTooltip(
+          message: 'Double-tap any row to open its details',
+          child: Icon(Icons.help_outline, size: 16, color: c.mutedForeground),
         ),
       ],
     );

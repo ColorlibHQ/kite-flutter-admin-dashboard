@@ -4,6 +4,9 @@ import '../../kite_ui/kite_ui.dart';
 
 /// Form elements with real validation — the point at which most free templates
 /// stop, having shipped inputs that look right and accept anything.
+///
+/// Every control here is a Kite wrapper, so the page inherits the theme rather
+/// than mixing shadcn chrome with stock Material controls.
 class FormsScreen extends StatefulWidget {
   const FormsScreen({super.key});
   @override
@@ -11,13 +14,18 @@ class FormsScreen extends StatefulWidget {
 }
 
 class _FormsScreenState extends State<FormsScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _email = TextEditingController();
-  final _qty = TextEditingController(text: '1');
+  final _notes = TextEditingController();
+
   String? _category;
+  DateTime? _shipDate;
+  double _discount = 10;
   bool _notify = true;
-  bool _submitted = false;
+  bool _backorder = false;
+
+  final _errors = <String, String?>{};
+  bool _saved = false;
 
   static const _categories = [
     'Hardware',
@@ -30,153 +38,175 @@ class _FormsScreenState extends State<FormsScreen> {
   void dispose() {
     _name.dispose();
     _email.dispose();
-    _qty.dispose();
+    _notes.dispose();
     super.dispose();
+  }
+
+  void _submit() {
+    final errors = <String, String?>{};
+    if (_name.text.trim().length < 3) {
+      errors['name'] = 'Use at least three characters.';
+    }
+    if (!_email.text.contains('@')) {
+      errors['email'] = 'Enter an address with an @ in it.';
+    }
+    if (_category == null) {
+      errors['category'] = 'Pick a category.';
+    }
+    if (_shipDate == null) {
+      errors['ship'] = 'Choose a ship date.';
+    }
+
+    setState(() {
+      _errors
+        ..clear()
+        ..addAll(errors);
+      _saved = errors.isEmpty;
+    });
+
+    if (errors.isEmpty) {
+      KiteToast.show(
+        context,
+        title: 'Product created',
+        description: '${_name.text} is now live in the catalogue.',
+        tone: KiteTone.success,
+      );
+    } else {
+      KiteToast.show(
+        context,
+        title:
+            '${errors.length} field${errors.length == 1 ? '' : 's'} need attention',
+        tone: KiteTone.danger,
+      );
+    }
+  }
+
+  void _reset() {
+    setState(() {
+      _name.clear();
+      _email.clear();
+      _notes.clear();
+      _category = null;
+      _shipDate = null;
+      _discount = 10;
+      _notify = true;
+      _backorder = false;
+      _errors.clear();
+      _saved = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final c = KiteColors.of(context);
     final t = KiteText.of(context);
-
-    InputDecoration deco(String hint) => InputDecoration(
-      hintText: hint,
-      hintStyle: t.muted.copyWith(fontSize: 14),
-      isDense: true,
-      filled: true,
-      fillColor: c.background,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: KiteSpace.md,
-        vertical: 12,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: KiteRadius.allSm,
-        borderSide: BorderSide(color: c.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: KiteRadius.allSm,
-        borderSide: BorderSide(color: c.ring, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: KiteRadius.allSm,
-        borderSide: BorderSide(color: c.destructive),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: KiteRadius.allSm,
-        borderSide: BorderSide(color: c.destructive, width: 1.5),
-      ),
-    );
-
-    Widget field(String label, Widget child) => Padding(
-      padding: const EdgeInsets.only(bottom: KiteSpace.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(label, style: t.small.copyWith(fontWeight: FontWeight.w500)),
-          const SizedBox(height: KiteSpace.sm),
-          child,
-        ],
-      ),
-    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 640),
+        constraints: const BoxConstraints(maxWidth: 680),
         child: KiteCard(
           title: 'New product',
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                field(
-                  'Product name',
-                  TextFormField(
-                    controller: _name,
-                    style: t.p.copyWith(fontSize: 14),
-                    decoration: deco('Standing desk'),
-                    validator: (v) => (v == null || v.trim().length < 3)
-                        ? 'Use at least three characters.'
-                        : null,
-                  ),
+          trailing: _saved
+              ? const KiteBadge('Saved', tone: KiteTone.success)
+              : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              KiteField(
+                label: 'Product name',
+                error: _errors['name'],
+                child: KiteInput(
+                  controller: _name,
+                  placeholder: 'Standing desk',
                 ),
-                field(
-                  'Contact email',
-                  TextFormField(
-                    controller: _email,
-                    style: t.p.copyWith(fontSize: 14),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: deco('you@company.com'),
-                    validator: (v) => (v == null || !v.contains('@'))
-                        ? 'Enter an address with an @ in it.'
-                        : null,
-                  ),
+              ),
+              KiteField(
+                label: 'Contact email',
+                hint: 'Used for stock alerts only.',
+                error: _errors['email'],
+                child: KiteInput(
+                  controller: _email,
+                  placeholder: 'you@company.com',
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                field(
-                  'Category',
-                  DropdownButtonFormField<String>(
-                    initialValue: _category,
-                    decoration: deco('Choose one'),
-                    style: t.p.copyWith(fontSize: 14, color: c.foreground),
-                    items: [
-                      for (final cat in _categories)
-                        DropdownMenuItem(value: cat, child: Text(cat)),
-                    ],
-                    onChanged: (v) => setState(() => _category = v),
-                    validator: (v) => v == null ? 'Pick a category.' : null,
-                  ),
-                ),
-                field(
-                  'Quantity',
-                  TextFormField(
-                    controller: _qty,
-                    style: t.p.copyWith(fontSize: 14),
-                    keyboardType: TextInputType.number,
-                    decoration: deco('1'),
-                    validator: (v) {
-                      final n = int.tryParse(v ?? '');
-                      if (n == null) return 'Numbers only.';
-                      if (n < 1) return 'At least one.';
-                      return null;
-                    },
-                  ),
-                ),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  value: _notify,
-                  onChanged: (v) => setState(() => _notify = v),
-                  title: Text('Email me when stock runs low', style: t.small),
-                ),
-                const SizedBox(height: KiteSpace.lg),
-                Row(
-                  children: [
-                    KiteButton(
-                      onPressed: () {
-                        final ok = _formKey.currentState?.validate() ?? false;
-                        setState(() => _submitted = ok);
-                      },
-                      child: const Text('Create product'),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: KiteField(
+                      label: 'Category',
+                      error: _errors['category'],
+                      child: KiteSelect<String>(
+                        options: _categories,
+                        labelOf: (v) => v,
+                        value: _category,
+                        placeholder: 'Choose one',
+                        onChanged: (v) => setState(() => _category = v),
+                      ),
                     ),
-                    const SizedBox(width: KiteSpace.md),
-                    KiteButton.ghost(
-                      onPressed: () {
-                        _formKey.currentState?.reset();
-                        setState(() {
-                          _submitted = false;
-                          _category = null;
-                        });
-                      },
-                      child: const Text('Reset'),
+                  ),
+                  const SizedBox(width: KiteSpace.lg),
+                  Expanded(
+                    child: KiteField(
+                      label: 'Ship date',
+                      error: _errors['ship'],
+                      child: KiteDatePicker(
+                        selected: _shipDate,
+                        onChanged: (v) => setState(() => _shipDate = v),
+                      ),
                     ),
-                    const Spacer(),
-                    if (_submitted)
-                      const KiteBadge('Saved', tone: KiteTone.success),
-                  ],
+                  ),
+                ],
+              ),
+              KiteField(
+                label: 'Notes',
+                hint: 'Anything the warehouse should know.',
+                child: KiteTextarea(
+                  controller: _notes,
+                  placeholder: 'Fragile — do not stack pallets.',
                 ),
-              ],
-            ),
+              ),
+              Text(
+                'Launch discount — ${_discount.round()}%',
+                style: t.small.copyWith(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: KiteSpace.sm),
+              KiteSlider(
+                value: _discount,
+                onChanged: (v) => setState(() => _discount = v),
+              ),
+              const SizedBox(height: KiteSpace.xl),
+              const KiteSeparator(),
+              const SizedBox(height: KiteSpace.xl),
+              KiteSwitch(
+                value: _notify,
+                label: 'Email me when stock runs low',
+                sublabel: 'At most one message a day.',
+                onChanged: (v) => setState(() => _notify = v),
+              ),
+              const SizedBox(height: KiteSpace.lg),
+              KiteCheckbox(
+                value: _backorder,
+                label: 'Allow backorders',
+                sublabel: 'Customers can order past zero stock.',
+                onChanged: (v) => setState(() => _backorder = v),
+              ),
+              const SizedBox(height: KiteSpace.xl),
+              Row(
+                children: [
+                  KiteButton(
+                    onPressed: _submit,
+                    child: const Text('Create product'),
+                  ),
+                  const SizedBox(width: KiteSpace.md),
+                  KiteButton.ghost(
+                    onPressed: _reset,
+                    child: const Text('Reset'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

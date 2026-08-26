@@ -28,6 +28,7 @@ class KiteDataTable extends StatelessWidget {
     required this.columns,
     required this.rows,
     this.onLoaded,
+    this.onRowTap,
     this.pageSize = 25,
     this.paginate = true,
   });
@@ -35,6 +36,10 @@ class KiteDataTable extends StatelessWidget {
   final List<TrinaColumn> columns;
   final List<TrinaRow<dynamic>> rows;
   final void Function(TrinaGridStateManager)? onLoaded;
+
+  /// Fired with the tapped row's index. Opening a detail drawer from a row is
+  /// the single most-used interaction in an admin table.
+  final void Function(int rowIdx)? onRowTap;
   final int pageSize;
   final bool paginate;
 
