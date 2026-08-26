@@ -10,8 +10,9 @@ on:
 
 env:
   FLUTTER_VERSION: '3.47.1'
-  # Spike A turns this into a contract. Replace with the measured value.
-  WASM_GZIP_BUDGET_KB: 2252
+  # Measured in Spike A (2026-08-26): 2.39 MB with unused Lucide fonts stripped.
+  # App-specific payload only — skwasm.wasm is CDN-shared and excluded.
+  WASM_GZIP_BUDGET_KB: 1400
 
 jobs:
   analyze:
@@ -96,19 +97,46 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build web --wasm --release
-      - name: Measure gzipped transfer size
+      - name: Measure gzipped app payload
+        # NOTE: build/web ships SIX mutually-exclusive renderer variants plus .symbols
+        # debug files. Summing the directory reports ~13 MB against a real 2.4 MB.
+        # Measure only what this app actually ships: its own wasm + declared assets.
         run: |
           total=0
+          for f in build/web/main.dart.wasm build/web/main.dart.mjs \
+                   build/web/flutter_bootstrap.js build/web/index.html; do
+            [ -f "$f" ] || continue
+            total=$((total + $(gzip -c "$f" | wc -c)))
+          done
           while IFS= read -r f; do
-            sz=$(gzip -c "$f" | wc -c)
-            total=$((total + sz))
-          done < <(find build/web -type f \
-                   \( -name '*.wasm' -o -name '*.js' -o -name '*.mjs' \
-                      -o -name '*.json' -o -name '*.html' -o -name '*.css' \))
+            total=$((total + $(gzip -c "$f" | wc -c)))
+          done < <(find build/web/assets -type f)
           kb=$((total / 1024))
-          echo "Gzipped transfer: ${kb} KB (budget ${WASM_GZIP_BUDGET_KB} KB)"
-          echo "wasm_gzip_kb=${kb}" >> "$GITHUB_STEP_SUMMARY"
+          echo "App payload: ${kb} KB gzip (budget ${WASM_GZIP_BUDGET_KB} KB)" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$kb" -gt "${WASM_GZIP_BUDGET_KB}" ]; then
-            echo "::error::Bundle ${kb} KB exceeds budget ${WASM_GZIP_BUDGET_KB} KB"
+            echo "::error::App payload ${kb} KB exceeds budget ${WASM_GZIP_BUDGET_KB} KB"
+            exit 1
+          fi
+
+  fonts:
+    # Regression guard for the biggest finding in Spike A: shadcn_ui pulls in seven
+    # Lucide font families and Flutter preloads every declared family.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build web --wasm --release
+      - name: No unreferenced Lucide font families
+        run: |
+          n=$(grep -o '"family":"[^"]*Lucide[^"]*"' \
+                build/web/assets/FontManifest.json | wc -l | tr -d ' ')
+          echo "Lucide families declared: $n"
+          if [ "$n" -gt 1 ]; then
+            echo "::error::$n Lucide families in FontManifest — each is ~200 KB downloaded eagerly. See docs/SPIKE-A.md"
             exit 1
           fi
