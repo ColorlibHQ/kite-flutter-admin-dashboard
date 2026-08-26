@@ -10,9 +10,13 @@ on:
 
 env:
   FLUTTER_VERSION: '3.47.1'
-  # Measured 2026-08-26: 2.73 MB total transfer with tools/strip-fonts.mjs applied.
-  # This budget covers the app payload only — skwasm.wasm is CDN-shared and excluded.
-  WASM_GZIP_BUDGET_KB: 1700
+  # App payload only — skwasm.wasm (~1.2 MB) comes from gstatic and is shared
+  # across every Flutter web app, so it is excluded. Measured 2026-08-26 on the
+  # Phase 1 shell: 1796 KB, of which ~515 KB is fonts (Lucide base 343 KB +
+  # Geist/GeistMono 172 KB). Budget is measured + ~10% headroom.
+  # Next lever if this gets tight: subset the base Lucide face to the glyphs
+  # shadcn actually draws. Do NOT drop it outright — see docs/SPIKE-B-C.md.
+  WASM_GZIP_BUDGET_KB: 1975
 
 jobs:
   analyze:
