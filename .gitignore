@@ -1,0 +1,16 @@
+.DS_Store
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+.vscode/
+pubspec.lock
+ios/Pods/
+ios/.symlinks/
+macos/Pods/
+android/.gradle/
+android/local.properties
+*.g.dart
+*.freezed.dart
+/coverage/

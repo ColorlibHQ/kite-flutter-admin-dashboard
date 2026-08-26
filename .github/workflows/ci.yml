@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly — catches Flutter SDK drift before a user reports it.
+    - cron: '0 6 * * 1'
+
+env:
+  FLUTTER_VERSION: '3.44.0'
+  # Spike A turns this into a contract. Replace with the measured value.
+  WASM_GZIP_BUDGET_KB: 2252
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --set-exit-if-changed .
+      - run: flutter analyze --fatal-infos
+
+  architecture:
+    # The one rule that matters: features never import the design library directly.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No shadcn_ui imports outside lib/kite_ui/
+        run: |
+          if grep -rn --include='*.dart' "package:shadcn_ui" lib \
+             | grep -v '^lib/kite_ui/'; then
+            echo "::error::shadcn_ui imported outside lib/kite_ui/ — see docs/ARCHITECTURE.md"
+            exit 1
+          fi
+          echo "OK: design library confined to lib/kite_ui/"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: flutter test --coverage
+
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: web-wasm
+            os: ubuntu-latest
+            cmd: flutter build web --wasm --release
+          - target: web-js
+            os: ubuntu-latest
+            cmd: flutter build web --release
+          - target: android
+            os: ubuntu-latest
+            cmd: flutter build apk --release
+          - target: ios
+            os: macos-latest
+            cmd: flutter build ios --release --no-codesign
+          - target: macos
+            os: macos-latest
+            cmd: flutter build macos --release
+          - target: windows
+            os: windows-latest
+            cmd: flutter build windows --release
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: ${{ matrix.cmd }}
+
+  size:
+    # The bundle cannot silently bloat. The README quotes a number; this keeps it true.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build web --wasm --release
+      - name: Measure gzipped transfer size
+        run: |
+          total=0
+          while IFS= read -r f; do
+            sz=$(gzip -c "$f" | wc -c)
+            total=$((total + sz))
+          done < <(find build/web -type f \
+                   \( -name '*.wasm' -o -name '*.js' -o -name '*.mjs' \
+                      -o -name '*.json' -o -name '*.html' -o -name '*.css' \))
+          kb=$((total / 1024))
+          echo "Gzipped transfer: ${kb} KB (budget ${WASM_GZIP_BUDGET_KB} KB)"
+          echo "wasm_gzip_kb=${kb}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$kb" -gt "${WASM_GZIP_BUDGET_KB}" ]; then
+            echo "::error::Bundle ${kb} KB exceeds budget ${WASM_GZIP_BUDGET_KB} KB"
+            exit 1
+          fi
