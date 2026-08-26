@@ -31,7 +31,7 @@ realistic data before you have written a line of backend code.
 
 - **A data table that actually works** — server-side pagination, sorting and filtering, wired up, not stubbed.
 - **Swap in your backend in one file** — implement `DataProvider` once and all 22 screens work. Ships with mock, REST and Supabase adapters.
-- **Genuinely current** — Flutter 3.44 / Dart 3.10, with a CI matrix that proves it builds green on six targets, every week.
+- **Genuinely current** — Flutter 3.47 / Dart 3.13, with a CI matrix that proves it builds green on six targets, every week.
 - **Mobile is not a reflow** — bottom navigation, card lists, full-screen forms. Not a squeezed desktop layout.
 - **MIT licensed.** Free for commercial use, no attribution required, no asterisk.
 

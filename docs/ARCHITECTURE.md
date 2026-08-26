@@ -101,11 +101,11 @@ renders. Getting this right is worth more than three extra dashboards.
 
 ## Version set
 
-Verified on pub.dev 2026-08-26. Unverified against a real resolve until the SDK exists.
+SDK version from the official releases feed; packages verified on pub.dev, both 2026-08-26. Unverified against a real resolve until the SDK exists.
 
 | Package | Version | Note |
 |---|---|---|
-| Flutter / Dart | 3.44 / 3.10 | Use dot shorthands — a visible "this is current" signal in every sample |
+| Flutter / Dart | **3.47.1 / 3.13.1** | Current stable, released 2026-08-19. Use dot shorthands — a visible "this is current" signal in every sample |
 | go_router | 18.0.0 | Nested shell routes, redirect guard, typed routes, deep links |
 | riverpod | 3.4 | Codegen **off** — readable source matters more than terseness in a template |
 | shadcn_ui | 0.56.1 | pre-1.0. Chosen on adoption; validate in Spike B |

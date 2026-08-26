@@ -19,8 +19,9 @@ web-first claim that a reviewer disproves in ten seconds with DevTools.
 ## Protocol
 
 ```bash
-flutter create --platforms=web kite_spike && cd kite_spike
-flutter pub add shadcn_ui fl_chart trina_grid
+fvm use 3.47.1
+fvm flutter create --platforms=web kite_spike && cd kite_spike
+fvm flutter pub add shadcn_ui fl_chart trina_grid
 ```
 
 Build a throwaway shell — **do not** reuse this code:
@@ -33,7 +34,7 @@ Build a throwaway shell — **do not** reuse this code:
 Then:
 
 ```bash
-flutter build web --wasm --release
+fvm flutter build web --wasm --release
 
 # Gzipped transfer size — the number that matters, not the on-disk size
 find build/web -type f \( -name '*.wasm' -o -name '*.js' -o -name '*.mjs' \
@@ -46,7 +47,7 @@ For LCP: serve `build/web` over a local static server, open Chrome DevTools → 
 throttle to **Fast 4G** + **4× CPU slowdown**, hard-reload, read Largest Contentful Paint.
 Record the median of five runs, not the best one.
 
-Also build `--release` without `--wasm` and record both. The JS fallback number matters because
+Also build `--release` without `--wasm` (`fvm flutter build web --release`) and record both. The JS fallback number matters because
 ~8% of traffic never gets WasmGC.
 
 ## Record here
