@@ -86,8 +86,26 @@ class _SidebarBody extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: KiteSpace.md),
             children: [
-              for (final item in kNav)
-                _NavTile(item: item, active: location == item.path),
+              for (final group in kNavGroups) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    KiteSpace.md,
+                    KiteSpace.lg,
+                    KiteSpace.md,
+                    KiteSpace.xs,
+                  ),
+                  child: Text(
+                    group.label.toUpperCase(),
+                    style: t.muted.copyWith(
+                      fontSize: 10,
+                      letterSpacing: 0.8,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                for (final item in group.items)
+                  _NavTile(item: item, active: location == item.path),
+              ],
             ],
           ),
         ),

@@ -42,7 +42,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final t = KiteText.of(context);
     return AuthScaffold(
       title: 'Sign in',
       subtitle: 'Any email works — this is the mock provider.',
@@ -52,22 +51,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           controller: _email,
           hint: 'you@company.com',
           keyboardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email],
+          error: _error,
         ),
         AuthField(
           label: 'Password',
           controller: _password,
           obscure: true,
-          autofillHints: const [AutofillHints.password],
           onSubmitted: (_) => _submit(),
         ),
-        if (_error != null) ...[
-          Text(
-            _error!,
-            style: t.small.copyWith(color: KiteColors.of(context).destructive),
-          ),
-          const SizedBox(height: KiteSpace.md),
-        ],
         KiteButton(
           expands: true,
           enabled: !_busy,

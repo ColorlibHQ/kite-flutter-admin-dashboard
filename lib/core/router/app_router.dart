@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/apps/calendar_screen.dart';
+import '../../features/apps/chat_screen.dart';
+import '../../features/apps/inbox_screen.dart';
+import '../../features/apps/kanban_screen.dart';
 import '../../features/auth/auth_screens.dart';
 import '../../features/components/components_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
@@ -66,6 +70,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: R.products,
             builder: (_, _) => const ResourceListScreen(resource: 'products'),
           ),
+          GoRoute(path: R.inbox, builder: (_, _) => const InboxScreen()),
+          GoRoute(path: R.kanban, builder: (_, _) => const KanbanScreen()),
+          GoRoute(path: R.calendar, builder: (_, _) => const CalendarScreen()),
+          GoRoute(path: R.chat, builder: (_, _) => const ChatScreen()),
           GoRoute(
             path: R.components,
             builder: (_, _) => const ComponentsScreen(),

@@ -13,6 +13,10 @@ abstract final class R {
   static const orders = '/orders';
   static const customers = '/customers';
   static const products = '/products';
+  static const inbox = '/inbox';
+  static const kanban = '/board';
+  static const calendar = '/calendar';
+  static const chat = '/chat';
   static const components = '/components';
   static const forms = '/forms';
   static const settings = '/settings';
@@ -36,12 +40,37 @@ class NavItem {
 
 /// The sidebar on desktop, the bottom bar on mobile — same source, so the two
 /// can never drift apart.
-const kNav = <NavItem>[
-  NavItem('Dashboard', R.dashboard, Icons.dashboard_outlined),
-  NavItem('Orders', R.orders, Icons.receipt_long_outlined),
-  NavItem('Customers', R.customers, Icons.people_outline),
-  NavItem('Products', R.products, Icons.inventory_2_outlined),
-  NavItem('Components', R.components, Icons.widgets_outlined),
-  NavItem('Forms', R.forms, Icons.edit_note_outlined),
-  NavItem('Settings', R.settings, Icons.settings_outlined),
+///
+/// Grouped rather than flat: eleven undifferentiated rows is a list to read,
+/// four labelled groups is a structure to scan.
+@immutable
+class NavGroup {
+  const NavGroup(this.label, this.items);
+  final String label;
+  final List<NavItem> items;
+}
+
+const kNavGroups = <NavGroup>[
+  NavGroup('Overview', [
+    NavItem('Dashboard', R.dashboard, Icons.dashboard_outlined),
+  ]),
+  NavGroup('Manage', [
+    NavItem('Orders', R.orders, Icons.receipt_long_outlined),
+    NavItem('Customers', R.customers, Icons.people_outline),
+    NavItem('Products', R.products, Icons.inventory_2_outlined),
+  ]),
+  NavGroup('Apps', [
+    NavItem('Inbox', R.inbox, Icons.mail_outline),
+    NavItem('Board', R.kanban, Icons.view_kanban_outlined),
+    NavItem('Calendar', R.calendar, Icons.calendar_today_outlined),
+    NavItem('Chat', R.chat, Icons.chat_bubble_outline),
+  ]),
+  NavGroup('Build', [
+    NavItem('Components', R.components, Icons.widgets_outlined),
+    NavItem('Forms', R.forms, Icons.edit_note_outlined),
+    NavItem('Settings', R.settings, Icons.settings_outlined),
+  ]),
 ];
+
+/// Flattened, for the mobile bottom bar and for resolving the page title.
+final kNav = [for (final g in kNavGroups) ...g.items];
