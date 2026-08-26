@@ -59,7 +59,7 @@ browser transfer (encoded bytes over the wire), not by summing files on disk.
 
 | Metric | Threshold | As built | Lucide fonts stripped |
 |---|---|---|---|
-| Transfer (gzip, real) | ≤ 2.2 MB | 3.88 MB | **2.39 MB** |
+| Transfer (gzip, real) | ≤ 2.2 MB | 3.88 MB | 2.39 MB *(icons broken — see B&C: 2.73 MB is the shippable figure)* |
 | — of which `skwasm.wasm` | — | 1.20 MB | 1.20 MB |
 | — of which `main.dart.wasm` | — | 0.98 MB | 0.98 MB |
 | — of which fonts | — | 1.53 MB | 0.17 MB |
@@ -75,9 +75,10 @@ browser transfer (encoded bytes over the wire), not by summing files on disk.
 every declared family, so all seven download even though this spike used Material icons
 exclusively. Dropping them cut transfer 38% and FCP 30%.
 
-> **Action for Phase 1:** strip unused Lucide families from the font manifest at build time, or
-> avoid `lucide_icons_flutter` entirely. This is the single largest performance lever in the
-> project and it costs nothing.
+> **Superseded — see `docs/SPIKE-B-C.md`.** Stripping *all* Lucide families breaks shadcn's own
+> icons (the `ShadSelect` chevron renders as a tofu box). The correct fix keeps the base `Lucide`
+> family and drops only the six numbered weights: **2.73 MB / FCP 3.62s**, saving 1.15 MB and
+> 1.18s with no visual regression. Implemented in `tools/strip-fonts.mjs`.
 
 **2. `skwasm.wasm` (1.20 MB) is fetched from `gstatic.com`, not the local build.** It is shared and
 cached across every Flutter web app, so a returning visitor — or anyone who has used any other

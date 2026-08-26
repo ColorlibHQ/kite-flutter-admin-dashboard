@@ -10,9 +10,9 @@ on:
 
 env:
   FLUTTER_VERSION: '3.47.1'
-  # Measured in Spike A (2026-08-26): 2.39 MB with unused Lucide fonts stripped.
-  # App-specific payload only — skwasm.wasm is CDN-shared and excluded.
-  WASM_GZIP_BUDGET_KB: 1400
+  # Measured 2026-08-26: 2.73 MB total transfer with tools/strip-fonts.mjs applied.
+  # This budget covers the app payload only — skwasm.wasm is CDN-shared and excluded.
+  WASM_GZIP_BUDGET_KB: 1700
 
 jobs:
   analyze:
@@ -97,6 +97,7 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build web --wasm --release
+      - run: node tools/strip-fonts.mjs build/web
       - name: Measure gzipped app payload
         # NOTE: build/web ships SIX mutually-exclusive renderer variants plus .symbols
         # debug files. Summing the directory reports ~13 MB against a real 2.4 MB.
@@ -131,12 +132,17 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build web --wasm --release
-      - name: No unreferenced Lucide font families
+      - name: Drop Lucide variable-weight instances
+        run: node tools/strip-fonts.mjs build/web
+      - name: Exactly one Lucide family must survive
+        # >1 means the strip step regressed and ~1.15 MB of unused weights ship.
+        #  0 means the BASE family was dropped too, which leaves tofu boxes where
+        #    shadcn's own icons should be. Both are failures. See docs/SPIKE-B-C.md
         run: |
           n=$(grep -o '"family":"[^"]*Lucide[^"]*"' \
                 build/web/assets/FontManifest.json | wc -l | tr -d ' ')
-          echo "Lucide families declared: $n"
-          if [ "$n" -gt 1 ]; then
-            echo "::error::$n Lucide families in FontManifest — each is ~200 KB downloaded eagerly. See docs/SPIKE-A.md"
+          echo "Lucide families surviving: $n (expected exactly 1)"
+          if [ "$n" -ne 1 ]; then
+            echo "::error::Expected exactly 1 Lucide family, found $n. See docs/SPIKE-B-C.md"
             exit 1
           fi
