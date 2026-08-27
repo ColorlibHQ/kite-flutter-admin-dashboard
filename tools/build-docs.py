@@ -10,6 +10,7 @@ prose, not copy-pasting navigation into it.
 """
 from __future__ import annotations
 
+import hashlib
 import html
 import re
 import shutil
@@ -73,7 +74,7 @@ SHELL = """<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="{css}">
 </head>
 <body>
 
@@ -143,8 +144,19 @@ def main() -> None:
         sys.exit(f"build-docs: missing fragments: {', '.join(sorted(missing))}")
 
     OUT.mkdir(parents=True, exist_ok=True)
-    for stale in OUT.glob("*.html"):
+    for stale in list(OUT.glob("*.html")) + list(OUT.glob("style*.css")):
         stale.unlink()
+
+    # Content-hash the stylesheet.
+    #
+    # These files are served with a 24-hour max-age from a CDN, so editing
+    # style.css in place means the edge keeps serving the old one until it
+    # expires or someone remembers to purge that exact URL. A stale stylesheet
+    # does not look like a caching problem — it looks like broken markup.
+    # Hashing the name means a change is always a URL that was never cached.
+    css_src = (SRC / "style.css").read_bytes()
+    css_name = f"style.{hashlib.sha256(css_src).hexdigest()[:10]}.css"
+    (OUT / css_name).write_bytes(css_src)
 
     for slug, (_, title, desc) in PAGES.items():
         content = (SRC / f"{slug}.html").read_text(encoding="utf-8").rstrip()
@@ -155,13 +167,12 @@ def main() -> None:
             sidebar=sidebar_for(slug),
             content=content,
             pager=pager_for(slug),
+            css=css_name,
         )
         (OUT / f"{slug}.html").write_text(page, encoding="utf-8")
 
-    shutil.copy(SRC / "style.css", OUT / "style.css")
-
     # Every internal link must resolve, or the site ships dead ends.
-    known = {f"{s}.html" for s in PAGES} | {"style.css"}
+    known = {f"{s}.html" for s in PAGES} | {css_name}
     broken: list[str] = []
     for page in OUT.glob("*.html"):
         body = page.read_text(encoding="utf-8")

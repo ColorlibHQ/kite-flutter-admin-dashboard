@@ -43,9 +43,16 @@ rclone check build/web/ r2pro:dashboardpack-demos/kite/   # expect "0 difference
 ## Docs
 
 ```bash
+python3 tools/build-docs.py
 rclone sync docs/site/ r2pro:dashboardpack-docs/kite-docs/ --dry-run
 rclone sync docs/site/ r2pro:dashboardpack-docs/kite-docs/
+./tools/purge-docs.sh
 ```
+
+> **Purge every file, not just the root.** `cf-purge-url` takes one URL.
+> Purging `/kite-docs/` alone leaves `style.css` cached, which serves a site
+> whose stylesheet is a version behind — and that reads as broken markup, not
+> as a stale cache. `tools/purge-docs.sh` walks the build output.
 
 ## Purging
 
