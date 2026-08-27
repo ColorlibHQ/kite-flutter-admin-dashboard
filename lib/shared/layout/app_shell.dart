@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,6 +7,7 @@ import '../../core/auth/session.dart';
 import '../../core/l10n/locale_controller.dart';
 import '../../core/router/routes.dart';
 import '../../core/theme/app_theme.dart';
+import '../../features/search/command_palette.dart';
 import '../../kite_ui/kite_ui.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -25,35 +27,52 @@ class AppShell extends ConsumerWidget {
     final c = KiteColors.of(context);
     final mobile = KiteBreak.isMobile(context);
 
-    return Scaffold(
-      backgroundColor: c.background,
-      drawer: mobile ? Drawer(child: _SidebarBody(location: location)) : null,
-      bottomNavigationBar: mobile ? _BottomBar(location: location) : null,
-      body: SafeArea(
-        child: Row(
-          children: [
-            if (!mobile)
-              SizedBox(
-                width: 248,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: c.card,
-                    // Directional: in RTL the sidebar moves to the right edge, so its
-                    // divider has to move with it.
-                    border: BorderDirectional(end: BorderSide(color: c.border)),
+    // ⌘K on macOS, Ctrl+K elsewhere. Bound on the shell rather than per
+    // screen, so it works from anywhere behind the auth guard.
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
+            showCommandPalette(context),
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+            showCommandPalette(context),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: c.background,
+          drawer: mobile
+              ? Drawer(child: _SidebarBody(location: location))
+              : null,
+          bottomNavigationBar: mobile ? _BottomBar(location: location) : null,
+          body: SafeArea(
+            child: Row(
+              children: [
+                if (!mobile)
+                  SizedBox(
+                    width: 248,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: c.card,
+                        // Directional: in RTL the sidebar moves to the right edge, so its
+                        // divider has to move with it.
+                        border: BorderDirectional(
+                          end: BorderSide(color: c.border),
+                        ),
+                      ),
+                      child: _SidebarBody(location: location),
+                    ),
                   ),
-                  child: _SidebarBody(location: location),
+                Expanded(
+                  child: Column(
+                    children: [
+                      _TopBar(location: location, mobile: mobile),
+                      Expanded(child: child),
+                    ],
+                  ),
                 ),
-              ),
-            Expanded(
-              child: Column(
-                children: [
-                  _TopBar(location: location, mobile: mobile),
-                  Expanded(child: child),
-                ],
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -299,11 +318,7 @@ class _SearchTrigger extends StatelessWidget {
       borderRadius: KiteRadius.allSm,
       child: InkWell(
         borderRadius: KiteRadius.allSm,
-        onTap: () => KiteToast.show(
-          context,
-          title: 'Command palette',
-          description: 'Wire this to your own search — the shell is here.',
-        ),
+        onTap: () => showCommandPalette(context),
         child: Container(
           width: 240,
           padding: const EdgeInsets.symmetric(
