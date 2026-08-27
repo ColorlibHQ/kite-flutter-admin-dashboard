@@ -10,6 +10,7 @@ import '../../core/theme/app_theme.dart';
 import '../../features/search/command_palette.dart';
 import '../../kite_ui/kite_ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'promo_card.dart';
 
 /// The persistent shell.
 ///
@@ -132,6 +133,10 @@ class _SidebarBody extends StatelessWidget {
             ],
           ),
         ),
+        // Pinned above the user tile rather than at the end of the scrolling
+        // nav list, where it sat below the fold on a laptop and was the first
+        // thing clipped. Nav scrolls independently above it.
+        if (kShowPromo) const PromoCard(),
         const Divider(height: 1),
         const _UserTile(),
       ],
