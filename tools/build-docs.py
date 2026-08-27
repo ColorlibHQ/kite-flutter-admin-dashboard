@@ -23,6 +23,32 @@ OUT = ROOT / "docs" / "site"
 
 REPO = "https://github.com/ColorlibHQ/kite-flutter-admin-dashboard"
 
+# Sidebar promo.
+#
+# The angle is deliberate: DashboardPack has no Flutter product, so "buy the
+# Pro version of this" would be a lie. What is true is that a team using Kite
+# for Flutter often needs the same admin in React or Next.js for something
+# else — that is a real need this can answer, which is why it belongs in the
+# docs rather than reading as an ad.
+#
+# UTM-tagged so its conversion is measurable rather than assumed.
+PROMO_URL = (
+    "https://dashboardpack.com/"
+    "?utm_source=kite-docs&utm_medium=sidebar&utm_campaign=kite-free"
+)
+
+PROMO = f"""<div class="promo">
+      <span class="promo-eyebrow">From the same team</span>
+      <b>Need this in React or Next&#46;js?</b>
+      <p>
+        Kite covers Flutter. DashboardPack has production admin templates for
+        Next&#46;js, React, Vue, Angular, Laravel, Svelte and plain HTML &mdash;
+        eight framework builds of Apex alone.
+      </p>
+      <a class="promo-cta" href="{PROMO_URL}">Browse templates &rarr;</a>
+      <span class="promo-note">From $69 &middot; commercial use</span>
+    </div>"""
+
 # (section, [(slug, nav label, <title>, one-line description)])
 NAV: list[tuple[str, list[tuple[str, str, str, str]]]] = [
     ("Start", [
@@ -90,7 +116,10 @@ SHELL = """<!doctype html>
 </header>
 
 <div class="shell">
-  <aside>{sidebar}</aside>
+  <aside>
+    {sidebar}
+    {promo}
+  </aside>
   <main>
 {content}
     <nav class="pager">{pager}</nav>
@@ -165,6 +194,7 @@ def main() -> None:
             desc=html.escape(desc),
             repo=REPO,
             sidebar=sidebar_for(slug),
+            promo=PROMO,
             content=content,
             pager=pager_for(slug),
             css=css_name,
