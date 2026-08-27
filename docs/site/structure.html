@@ -81,7 +81,7 @@
 <div class="note warn">
   <p>
     <b>No <code>shadcn_ui</code> type may appear outside
-    <code>lib/kite_ui/</code>.</b>
+    <code>packages/kite_ui/</code>.</b>
   </p>
   <p>
     It is a pre-1.0 library (0.55.x, capped by <code>trina_grid</code>) that
@@ -93,8 +93,8 @@
 <p>
   CI enforces this with a grep, so it cannot quietly rot:
 </p>
-<pre><code>if grep -rn --include='*.dart' "package:shadcn_ui" lib | grep -v '^lib/kite_ui/'; then
-  echo "::error::shadcn_ui imported outside lib/kite_ui/"
+<pre><code>if grep -rn --include='*.dart' "package:shadcn_ui" lib; then
+  echo "::error::shadcn_ui imported outside packages/kite_ui/"
   exit 1
 fi</code></pre>
 <p>

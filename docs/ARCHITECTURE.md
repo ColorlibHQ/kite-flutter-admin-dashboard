@@ -2,14 +2,14 @@
 
 ## The one rule
 
-**No `shadcn_ui` type may appear outside `lib/kite_ui/`.**
+**No `shadcn_ui` type may appear outside `packages/kite_ui/`.**
 
 It is a pre-1.0 library (0.56) moving fast enough to ship breaking changes mid-build, and it is
 also the decision most likely to be revisited — it has 3× the downloads of `forui` but shipped 7
 commits last quarter against forui's 90. Feature code imports Kite widgets; Kite widgets import the
 design library. When the dependency breaks, the blast radius is one folder.
 
-`lib/kite_ui/_shadcn.dart` is the single import surface — the named swap point.
+`packages/kite_ui/lib/shadcn.dart` is the single import surface — the named swap point.
 
 CI enforces this with a grep. It is not a convention people have to remember.
 

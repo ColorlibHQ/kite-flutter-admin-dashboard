@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '_shadcn.dart';
+import '../shadcn.dart';
 
 /// Semantic tone, separate from the brand accent. A status has to read at a
 /// glance without relying on the reader parsing the label.
@@ -30,8 +30,9 @@ class KiteBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: ShadTheme.of(context).textTheme.small
-            .copyWith(color: fg, fontSize: 12, height: 1.2),
+        style: ShadTheme.of(
+          context,
+        ).textTheme.small.copyWith(color: fg, fontSize: 12, height: 1.2),
       ),
     );
   }

@@ -15,23 +15,18 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
 
-  # Design language. Confined to lib/kite_ui/ — see docs/ARCHITECTURE.md.
-  # Capped at 0.55.x by trina_grid, which depends on shadcn_ui ^0.55.0.
-  shadcn_ui: ^0.55.1
+  # The UI layer, published from packages/kite_ui in this repo. A path
+  # dependency on purpose: this is a template, so the widgets should be
+  # editable source, not a black box. It is the same code as the published
+  # package — see docs/ARCHITECTURE.md.
+  kite_ui:
+    path: packages/kite_ui
 
   # Routing: nested shells, redirect guard, typed routes, deep links.
   go_router: ^18.0.0
 
   # State. Codegen deliberately off — readable source matters in a template.
   flutter_riverpod: ^3.0.0
-
-  # Charts. MIT; deliberately not Syncfusion, whose community licence is a
-  # trap in a free template.
-  fl_chart: ^1.2.0
-
-  # Data grid. Maintained fork of pluto_grid. Verified in Spike C at 10,000
-  # rows: p95 9.0ms unthrottled, 16.7ms at 4x CPU.
-  trina_grid: ^2.3.0
 
   intl: any
   http: ^1.6.0

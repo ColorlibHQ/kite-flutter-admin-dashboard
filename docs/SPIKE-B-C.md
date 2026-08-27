@@ -47,7 +47,7 @@ took that to mean the grid would come out shadcn-styled for free. It does not:
   zone to the right of the last column.
 
 None of this is fatal, but it is **real Phase 1 work**: theming the grid to match. It belongs in
-`lib/kite_ui/data_table.dart`, which is exactly what the wrapper architecture is for — and it is a
+`packages/kite_ui/lib/src/data_table.dart`, which is exactly what the wrapper architecture is for — and it is a
 good argument for the wrapper existing, since the theming has to live somewhere anyway.
 
 ## Correction to Spike A's font finding

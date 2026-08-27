@@ -1,0 +1,44 @@
+name: kite_ui
+description: >-
+  Dashboard widgets for Flutter admin panels: stat grids, sparklines, donut and
+  line charts, a themed data table, menus, inputs and design tokens. Built on
+  shadcn_ui.
+version: 0.1.0
+repository: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard
+issue_tracker: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/issues
+documentation: https://docs.dashboardpack.com/kite-docs/
+topics:
+  - ui
+  - dashboard
+  - admin
+  - widgets
+  - charts
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The design language this layer is built on. Pre-1.0 and moving fast; the
+  # whole point of this package is that consumers never name it directly.
+  # Capped at 0.55.x by trina_grid, which depends on shadcn_ui ^0.55.0.
+  shadcn_ui: ^0.55.1
+
+  # Charts behind KiteChart / KiteSparkline / KiteDonut.
+  fl_chart: ^1.2.0
+
+  # Data grid behind KiteDataTable. Maintained fork of pluto_grid.
+  trina_grid: ^2.3.0
+
+  # Number, currency and date formatting in KiteFormat. Constrained rather
+  # than `any`: flutter_localizations pins intl tightly, and an unbounded
+  # constraint here promises support for versions that do not exist yet.
+  intl: ">=0.19.0 <0.21.0"
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

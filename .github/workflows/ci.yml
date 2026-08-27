@@ -33,14 +33,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: No shadcn_ui imports outside lib/kite_ui/
+      - name: No shadcn_ui imports outside packages/kite_ui/
         run: |
-          if grep -rn --include='*.dart' "package:shadcn_ui" lib \
-             | grep -v '^lib/kite_ui/'; then
-            echo "::error::shadcn_ui imported outside lib/kite_ui/ — see docs/ARCHITECTURE.md"
+          # The app reaches shadcn only through package:kite_ui/shadcn.dart.
+          # Naming shadcn_ui anywhere in lib/ defeats the point of the layer.
+          if grep -rn --include='*.dart' "package:shadcn_ui" lib; then
+            echo "::error::shadcn_ui imported outside packages/kite_ui/ — see docs/ARCHITECTURE.md"
             exit 1
           fi
-          echo "OK: design library confined to lib/kite_ui/"
+          echo "OK: design library confined to packages/kite_ui/"
 
   test:
     runs-on: ubuntu-latest

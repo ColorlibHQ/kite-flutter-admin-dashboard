@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '_shadcn.dart';
+import '../shadcn.dart';
 
 enum KiteButtonVariant { primary, secondary, outline, ghost, destructive, link }
 

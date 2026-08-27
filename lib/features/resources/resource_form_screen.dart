@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/data/data_provider.dart';
 import '../../core/data/mock_data_provider.dart';
-import '../../kite_ui/kite_ui.dart';
 import '../../shared/widgets/states.dart';
 import 'resource_detail_screen.dart';
 import 'resource_providers.dart';

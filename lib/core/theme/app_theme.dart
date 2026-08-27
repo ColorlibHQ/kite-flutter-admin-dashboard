@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../kite_ui/_shadcn.dart';
+import 'package:kite_ui/shadcn.dart';
 
 /// Accents. Three is deliberate: enough to prove the theming is real, few
 /// enough that every one is checked in both brightnesses before release.

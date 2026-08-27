@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '_shadcn.dart';
+import '../shadcn.dart';
 import 'tokens.dart';
 
 @immutable

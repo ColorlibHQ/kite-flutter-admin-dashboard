@@ -1,0 +1,19 @@
+name: kite_ui_example
+description: A small dashboard built with kite_ui.
+publish_to: "none"
+version: 1.0.0
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  kite_ui:
+    path: ../
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

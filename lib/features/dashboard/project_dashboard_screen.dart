@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../kite_ui/kite_ui.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 /// A second dashboard with a genuinely different job.
 ///

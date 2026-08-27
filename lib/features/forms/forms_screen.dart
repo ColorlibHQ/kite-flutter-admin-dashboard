@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../kite_ui/kite_ui.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 /// Form elements with real validation — the point at which most free templates
 /// stop, having shipped inputs that look right and accept anything.

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kite/kite_ui/format.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 void main() {
   group('KiteFormat.money', () {

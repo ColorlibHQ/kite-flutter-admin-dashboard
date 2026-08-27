@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '_shadcn.dart';
+import '../shadcn.dart';
 import 'tokens.dart';
 
 export 'package:shadcn_ui/shadcn_ui.dart' show ShadOption;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../kite_ui/kite_ui.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 /// Shared frame for the five auth screens: centred card, product mark, and a
 /// footer link. Keeps them consistent without five copies of the same layout.

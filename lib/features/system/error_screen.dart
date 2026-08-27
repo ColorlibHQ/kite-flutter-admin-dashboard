@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/router/routes.dart';
-import '../../kite_ui/kite_ui.dart';
 
 class NotFoundScreen extends StatelessWidget {
   const NotFoundScreen({super.key, required this.location});

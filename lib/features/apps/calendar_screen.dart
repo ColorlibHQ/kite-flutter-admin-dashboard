@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../kite_ui/_shadcn.dart';
-import '../../kite_ui/kite_ui.dart';
+import 'package:kite_ui/kite_ui.dart';
+import 'package:kite_ui/shadcn.dart';
 
 @immutable
 class CalendarEvent {

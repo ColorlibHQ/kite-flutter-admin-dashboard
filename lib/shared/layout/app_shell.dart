@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/auth/session.dart';
 import '../../core/l10n/locale_controller.dart';
 import '../../core/router/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/search/command_palette.dart';
-import '../../kite_ui/kite_ui.dart';
 import '../../l10n/app_localizations.dart';
 import 'promo_card.dart';
 

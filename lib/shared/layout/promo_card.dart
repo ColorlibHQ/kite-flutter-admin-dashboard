@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kite_ui/kite_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../kite_ui/kite_ui.dart';
 
 /// Whether the sidebar promo is shown.
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '_shadcn.dart';
+import '../shadcn.dart';
 
 /// Spacing scale. Every gap in the app comes from here, so density can be
 /// retuned in one place rather than hunted through widgets.

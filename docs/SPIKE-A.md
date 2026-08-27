@@ -100,7 +100,7 @@ job was corrected to match.
 - **B — does `shadcn_ui` hold up dense?** Base library is decided on adoption (3× the downloads of
   the nearest rival). Open question is whether it survives a data table with filters, toolbar and
   pagination. Count how often you fight it. Fails badly → `forui` is the documented fallback, and
-  `lib/kite_ui/_shadcn.dart` makes that a one-folder swap.
+  `packages/kite_ui/lib/shadcn.dart` makes that a one-folder swap.
 - **C — does the grid survive real data?** 10,000 rows into `trina_grid`. Scroll hard, sort, filter.
   Target: sustained 60fps on desktop web, no dropped-frame cascade on a mid-range Android device.
   Fails → virtualised list on small screens.

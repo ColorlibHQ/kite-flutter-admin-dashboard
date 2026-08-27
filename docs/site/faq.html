@@ -186,7 +186,7 @@
 <div class="api">
   <h3>The architecture job fails</h3>
   <p>
-    Something outside <code>lib/kite_ui/</code> imports
+    Something outside <code>packages/kite_ui/</code> imports
     <code>package:shadcn_ui</code>. Wrap what you need in
     <code>kite_ui</code> and import that instead — see
     <a href="structure.html">the one rule</a>.
@@ -215,7 +215,7 @@
   <h3>Can I use forui, or plain Material, instead of shadcn_ui?</h3>
   <p>
     Yes — that is what <code>kite_ui</code> is for.
-    <code>lib/kite_ui/_shadcn.dart</code> is the single import surface; change it
+    <code>packages/kite_ui/lib/shadcn.dart</code> is the single import surface; change it
     and reimplement the wrappers. Nothing in <code>features/</code> moves.
   </p>
 </div>
