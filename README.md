@@ -24,8 +24,17 @@ This **Flutter admin dashboard template** runs from one codebase on the web, iOS
 and Windows. Clone it and run it: the mock data provider means you get a fully working admin with
 realistic data before you have written a line of backend code.
 
-<!-- TODO: replace with the animated GIF. This is the single highest-leverage asset in the repo. -->
-![Preview](docs/preview.gif)
+![Kite — Flutter admin dashboard template](docs/demo.gif)
+
+*Light and dark, the ⌘K command palette searching real records, a data table with
+server-side pagination, drag-and-drop on the board, and the component showcase.
+Recorded from the running app with `tools/record-demo.mjs`.*
+
+## What is in it
+
+**22 screens** — three dashboards, five auth screens, list/detail/create/edit for
+three resources, inbox, board, calendar, chat, a component showcase, forms, a
+multi-step wizard, settings, profile, and both error pages.
 
 ## Why Kite
 
@@ -54,8 +63,13 @@ flutter run
 
 ## Docs
 
+**[Full documentation →](https://colorlibhq.github.io/kite-flutter-admin-dashboard/)**
+— getting started, connecting a backend, adding a resource, theming, localisation
+and deployment. Source in [`docs/site/`](docs/site/).
+
 - [Architecture](docs/ARCHITECTURE.md) — the one rule, the layout, and the `DataProvider` contract
 - [Distribution](docs/DISTRIBUTION.md) — why this README is ordered the way it is
+- [Spike A](docs/SPIKE-A.md) / [Spikes B & C](docs/SPIKE-B-C.md) — the measurements the build rests on
 
 ## License
 

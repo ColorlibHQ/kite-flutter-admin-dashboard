@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kite — Flutter admin dashboard template docs</title>
+<meta name="description" content="Documentation for Kite, a free MIT-licensed Flutter admin dashboard template running on web, iOS, Android, macOS and Windows from one codebase.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite
+  </a>
+  <nav>
+    <a href="#getting-started">Getting started</a>
+    <a href="#data">Data</a>
+    <a href="#theming">Theming</a>
+    <a href="#deploy">Deploy</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside>
+    <h4>Start</h4>
+    <a href="#getting-started">Getting started</a>
+    <a href="#structure">Project structure</a>
+    <a href="#screens">Screens</a>
+    <h4>Build on it</h4>
+    <a href="#data">Connecting a backend</a>
+    <a href="#resources">Adding a resource</a>
+    <a href="#theming">Theming</a>
+    <a href="#components">Components</a>
+    <a href="#i18n">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="#deploy">Deploying</a>
+    <a href="#size">Bundle size</a>
+    <a href="#faq">FAQ</a>
+  </aside>
+
+  <main>
+    <h1>Kite</h1>
+    <p class="lead">
+      A free, MIT-licensed Flutter admin dashboard template. Web, iOS, Android,
+      macOS and Windows from one codebase — with a data layer you can point at
+      your own backend in one line.
+    </p>
+
+    <h2 id="getting-started">Getting started</h2>
+    <p>Kite targets <strong>Flutter 3.47</strong> and <strong>Dart 3.13</strong>.</p>
+<pre><code>git clone https://github.com/ColorlibHQ/kite-flutter-admin-dashboard
+cd kite-flutter-admin-dashboard
+flutter pub get
+flutter run</code></pre>
+    <p>
+      That is the whole setup. Kite starts on <code>MockDataProvider</code>, so
+      you get a working admin with plausible data — 1,284 orders, 642 customers,
+      312 products — before writing a line of backend code. Sign in with any
+      email; the field is prefilled.
+    </p>
+    <div class="note good">
+      <p>
+        <b>The mock provider does real work.</b> Search, filtering, sorting and
+        pagination all execute server-side against in-memory tables and return a
+        page plus a total. Your screens exercise the same code paths a real
+        backend will.
+      </p>
+    </div>
+
+    <h2 id="structure">Project structure</h2>
+<pre><code>lib/
+├── kite_ui/        the ONLY folder that imports the design library
+├── core/
+│   ├── router/     go_router: shells, guards, typed routes, 404
+│   ├── theme/      light + dark × 3 accents
+│   ├── data/       DataProvider + mock / REST / Supabase adapters
+│   ├── auth/       session controller and guard wiring
+│   └── l10n/       5 locales, RTL verified
+├── shared/         AppShell, layout, empty/loading/error states
+└── features/       one folder per screen group</code></pre>
+    <div class="note warn">
+      <p>
+        <b>One rule matters more than the rest:</b> no <code>shadcn_ui</code>
+        type may appear outside <code>lib/kite_ui/</code>. It is a pre-1.0
+        library and will ship breaking changes; confining it means the blast
+        radius is one folder. CI enforces this with a grep, so it cannot rot.
+      </p>
+    </div>
+
+    <h2 id="screens">Screens</h2>
+    <table>
+      <thead><tr><th>Group</th><th>Screens</th></tr></thead>
+      <tbody>
+        <tr><td>Dashboards</td><td>Analytics and Projects — different jobs, not recolours of each other</td></tr>
+        <tr><td>Auth</td><td>Sign in, sign up, reset, OTP, lock — wired to a real route guard</td></tr>
+        <tr><td>Resources</td><td>List, detail, create and edit for orders, customers and products</td></tr>
+        <tr><td>Apps</td><td>Inbox, board (real drag-and-drop), calendar, chat</td></tr>
+        <tr><td>Forms</td><td>Element showcase and a four-step wizard with per-step validation</td></tr>
+        <tr><td>System</td><td>Components showcase, settings, profile, 404 and 500</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="data">Connecting a backend</h2>
+    <p>
+      Screens never talk to HTTP. They talk to <code>DataProvider</code>, which
+      is five methods:
+    </p>
+<pre><code>abstract interface class DataProvider {
+  Future&lt;ListResult&gt; getList(String resource, ListParams params);
+  Future&lt;JsonMap&gt;   getOne (String resource, String id);
+  Future&lt;JsonMap&gt;   create (String resource, JsonMap data);
+  Future&lt;JsonMap&gt;   update (String resource, String id, JsonMap data);
+  Future&lt;void&gt;      delete (String resource, String id);
+}</code></pre>
+    <p>
+      Three implementations ship. Swap one line in
+      <code>lib/core/data/mock_data_provider.dart</code> and every screen —
+      including the ⌘K command palette — follows:
+    </p>
+<pre><code>// REST
+final dataProvider = Provider&lt;DataProvider&gt;(
+  (ref) =&gt; RestDataProvider(baseUrl: 'https://api.example.com'),
+);
+
+// Supabase (PostgREST over http — no supabase_flutter dependency)
+final dataProvider = Provider&lt;DataProvider&gt;(
+  (ref) =&gt; SupabaseDataProvider(
+    url: 'https://xyzcompany.supabase.co',
+    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+  ),
+);</code></pre>
+    <div class="note">
+      <p>
+        <b>The total is the part to get right.</b> <code>ListResult.total</code>
+        is the count across <em>all</em> pages, not the length of the page you
+        were handed. <code>RestDataProvider</code> reads it from
+        <code>X-Total-Count</code>; the Supabase adapter reads
+        <code>Content-Range</code> with <code>Prefer: count=exact</code>. If your
+        API spells this differently, that is the one place to change.
+      </p>
+    </div>
+
+    <h2 id="resources">Adding a resource</h2>
+    <p>
+      List, detail, create and edit are generic. A new resource is a schema
+      entry in <code>lib/features/resources/resource_schema.dart</code> — not
+      four new screens.
+    </p>
+<pre><code>'invoices': ResourceSpec(
+  name: 'invoices',
+  singular: 'Invoice',
+  titleField: 'number',
+  statuses: ['Draft', 'Sent', 'Paid', 'Overdue'],
+  fields: [
+    FieldSpec('number', 'Invoice', ColKind.text, editable: false),
+    FieldSpec('client', 'Client', ColKind.text),
+    FieldSpec('amount', 'Amount', ColKind.money),
+    FieldSpec('status', 'Status', ColKind.select,
+        options: ['Draft', 'Sent', 'Paid', 'Overdue']),
+    FieldSpec('notes', 'Notes', ColKind.longText, inList: false),
+  ],
+),</code></pre>
+    <p>
+      Add <code>'invoices'</code> to the resource loop in
+      <code>lib/core/router/app_router.dart</code> and a nav entry in
+      <code>routes.dart</code>. That is the whole job: the table columns, their
+      alignment and formatting, the detail rows, the edit form and its
+      validation all derive from the spec.
+    </p>
+
+    <h2 id="theming">Theming</h2>
+    <p>
+      Light and dark across three accents, switchable at runtime from Settings.
+      Features read colour through <code>KiteColors.of(context)</code> rather
+      than the design library, which is what keeps that library swappable.
+    </p>
+<pre><code>final c = KiteColors.of(context);
+final t = KiteText.of(context);
+
+Container(
+  padding: const EdgeInsets.all(KiteSpace.xl),
+  decoration: BoxDecoration(
+    color: c.card,
+    border: Border.all(color: c.border),
+    borderRadius: KiteRadius.allLg,
+  ),
+  child: Text('Revenue', style: t.muted),
+);</code></pre>
+    <p>
+      Add an accent by extending <code>KiteAccent</code> in
+      <code>lib/core/theme/app_theme.dart</code>. Spacing comes from
+      <code>KiteSpace</code> and radii from <code>KiteRadius</code>, so density
+      is retuned in one file rather than hunted through widgets.
+    </p>
+
+    <h2 id="components">Components</h2>
+    <p>
+      Everything in <code>kite_ui</code> is on the Components screen in the
+      running app, with live state — the controls there are real, not pictures
+      of controls.
+    </p>
+    <table>
+      <thead><tr><th>Widget</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>KiteButton</td><td>Six variants, leading/trailing icons, proper disabled state</td></tr>
+        <tr><td>KiteDataTable</td><td>Themed <code>trina_grid</code>; server-side paging, currency columns, row actions</td></tr>
+        <tr><td>KiteStatGrid</td><td>Fixed-height tiles, flexible width — see <a href="#faq">FAQ</a></td></tr>
+        <tr><td>KiteSparkline / KiteLineChart / KiteDonut / KiteBarRow</td><td>fl_chart wrappers with formatted tooltips</td></tr>
+        <tr><td>KiteField + inputs</td><td>Input, textarea, select, checkbox, switch, slider, date picker</td></tr>
+        <tr><td>KiteMenu</td><td>Popover dropdown; closes before running its callback</td></tr>
+        <tr><td>kiteConfirm / kiteSheet / KiteToast</td><td>Destructive dialog, detail drawer, action feedback</td></tr>
+        <tr><td>KiteAvatar / KiteBadge / KiteMeter / KiteAlert</td><td>Initials fallback, semantic tones</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="i18n">Localisation</h2>
+    <p>
+      English, Spanish, French, Japanese and Arabic. Strings live in
+      <code>lib/l10n/*.arb</code>; regenerate with <code>flutter gen-l10n</code>.
+    </p>
+    <div class="note warn">
+      <p>
+        <b>Arabic is included on purpose.</b> It is the cheapest way to keep the
+        layout honest — a UI that has never rendered right-to-left is usually
+        full of hard-coded left padding nobody noticed. Use
+        <code>AlignmentDirectional</code>, <code>EdgeInsetsDirectional</code> and
+        <code>BorderDirectional</code> in anything you add.
+      </p>
+      <p>
+        Coverage today is navigation, shell chrome, settings and auth. Screen
+        bodies still hold English literals; the pattern is in place and
+        extraction is mechanical.
+      </p>
+    </div>
+
+    <h2 id="deploy">Deploying</h2>
+<pre><code>flutter build web --wasm --release
+node tools/strip-fonts.mjs build/web
+python3 tools/subset-lucide.py build/web</code></pre>
+    <p>
+      Serve <code>build/web</code> from any static host. Kite uses path URLs
+      rather than Flutter's default hash URLs, so <strong>the host must serve
+      <code>index.html</code> for unknown paths</strong> — otherwise
+      <code>/orders/10004</code> is a 404 on refresh. Cloudflare Pages, Netlify
+      and Vercel do this by default; <code>tools/serve.mjs</code> does it
+      locally.
+    </p>
+    <p>Mobile and desktop are ordinary Flutter builds:</p>
+<pre><code>flutter build apk --release
+flutter build ios --release
+flutter build macos --release
+flutter build windows --release</code></pre>
+
+    <h2 id="size">Bundle size</h2>
+    <p>
+      The web build is about <strong>1.6 MB gzipped</strong> of app payload,
+      plus a shared <code>skwasm.wasm</code> served from Google's CDN and cached
+      across every Flutter site your visitors have used.
+    </p>
+    <p>
+      Both font tools above matter. <code>--tree-shake-icons</code> only manages
+      ~12% on Lucide because shadcn reaches its icons through wrappers that
+      defeat static analysis — but it only ever draws eleven of them. Together
+      the two tools take the payload from roughly 2.2 MB to 1.6 MB, and CI fails
+      the build if it grows past budget.
+    </p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <h3>Why is my stat card growing taller on wide screens?</h3>
+    <p>
+      Because it is in a <code>GridView</code> with a
+      <code>childAspectRatio</code>, which ties height to width. Use
+      <code>KiteStatGrid</code>: fixed height, flexible width. Aspect ratio is
+      right for things whose content genuinely scales with size — thumbnails,
+      media cards — and wrong for anything with a fixed amount to say.
+    </p>
+
+    <h3>Why does my detail page ignore <code>maxWidth</code>?</h3>
+    <p>
+      <code>SingleChildScrollView</code> passes a <em>tight</em> width
+      constraint, and <code>ConstrainedBox</code> cannot shrink below one. Wrap
+      it in <code>Align</code> first to loosen the constraint.
+    </p>
+
+    <h3>Can I use forui or Material instead of shadcn_ui?</h3>
+    <p>
+      Yes — that is what the <code>kite_ui</code> layer is for.
+      <code>lib/kite_ui/_shadcn.dart</code> is the single import surface; swap
+      it and reimplement the wrappers. Nothing in <code>features/</code>
+      changes.
+    </p>
+
+    <h3>Is it really free?</h3>
+    <p>
+      MIT. Commercial use, no attribution required. Four of the ten
+      most-starred free Flutter admin projects have no licence file at all,
+      which makes them unusable in commercial work — that is not a formality we
+      wanted to repeat.
+    </p>
+  </main>
+</div>
+
+<footer>
+  MIT © <a href="https://colorlib.com">Colorlib</a> — the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

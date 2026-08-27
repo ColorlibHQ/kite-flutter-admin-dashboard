@@ -44,3 +44,24 @@ python3 tools/subset-lucide.py build/web
 
 Both run in CI before the size gate. Together they take the app payload from
 2,240 KB to 1,562 KB.
+
+## record-demo.mjs + build-gif.py
+
+The README demo. Flutter renders to a canvas, so Playwright's video recording
+and `fullPage` screenshots both fall over — frames are captured one at a time
+and assembled by Pillow, no ffmpeg involved.
+
+```bash
+node tools/record-demo.mjs build/web /tmp/kite-frames
+python3 tools/build-gif.py /tmp/kite-frames docs/demo.gif --width 900 --ms 380
+```
+
+`build-gif.py` derives one palette for the whole run from sampled frames, so it
+covers both themes rather than whichever the first frame used, and merges runs
+of identical frames into a single frame with a longer duration — GIF
+optimisation drops duplicates otherwise, which removes the pause instead of
+shortening it.
+
+**The recorder clicks the sidebar by coordinate.** Adding a nav item shifts
+everything below it and the recording lands on the wrong screens. Positions and
+spacing are documented in the `NAV` constant.
