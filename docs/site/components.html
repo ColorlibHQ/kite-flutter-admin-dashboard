@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component reference</title>
+<meta name="description" content="Every widget in kite_ui, what it is for, and how to use it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html" class="here">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Component reference</h1>
+<p class="lead">
+  Everything in <code>kite_ui</code>. All of it is on the
+  <a href="https://demo.dashboardpack.com/kite/components">Components screen</a>
+  in the running app, live and stateful.
+</p>
+<p>
+  One import gets you the lot. Features never import anything below it — see
+  <a href="structure.html">the one rule</a>.
+</p>
+<pre><code>import '../../kite_ui/kite_ui.dart';</code></pre>
+
+<h2>Tokens</h2>
+
+<div class="api">
+  <h3>KiteColors.of(context)</h3>
+  <p>Theme colours as an extension type. See <a href="theming.html">Theming</a> for the full token list.</p>
+  <pre><code>final c = KiteColors.of(context);
+c.background  c.card  c.border  c.primary  c.muted
+c.mutedForeground  c.accent  c.destructive  c.ring</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteText.of(context)</h3>
+  <p>Type scale. <code>h1</code>–<code>h4</code>, <code>p</code>, <code>lead</code>, <code>large</code>, <code>small</code>, <code>muted</code>.</p>
+  <pre><code>Text('Revenue', style: KiteText.of(context).h3)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteSpace · KiteRadius · KiteBreak</h3>
+  <p>Spacing scale, corner radii, and responsive predicates.</p>
+  <pre><code>const EdgeInsets.all(KiteSpace.xl)          // 24
+borderRadius: KiteRadius.allLg              // 12
+if (KiteBreak.isDesktop(context)) …         // ≥ 1024</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteFormat</h3>
+  <p>Money and counts. Money is always two decimals with a thousands separator — <code>$699.0</code> in a column of currency reads as a bug, because it is one.</p>
+  <pre><code>KiteFormat.money(1264.55)        // $1,264.55
+KiteFormat.compactMoney(284120)  // $284K
+KiteFormat.count(3412)           // 3,412
+KiteFormat.money(null)           // —</code></pre>
+</div>
+
+<h2>Layout and surfaces</h2>
+
+<div class="api">
+  <h3>KiteCard</h3>
+  <p>The standard surface. Optional title and trailing widget.</p>
+  <pre><code>KiteCard(
+  title: 'Revenue',
+  trailing: const KiteBadge('Last 60 days', tone: KiteTone.info),
+  child: SizedBox(height: 250, child: KiteLineChart(spots: spots)),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteStat</h3>
+  <p>A stat tile: label, value, and a delta whose direction is encoded in colour as well as sign.</p>
+  <pre><code>KiteStat(
+  label: 'Revenue',
+  value: r'$284,120',
+  delta: '+12.4%',
+  deltaTone: KiteTone.success,
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteStatGrid</h3>
+  <p>
+    Lays tiles out at <strong>fixed height, flexible width</strong>, dropping a
+    column when they would fall below <code>minTileWidth</code>.
+  </p>
+  <div class="note warn">
+    <p>
+      <b>Use this rather than <code>GridView.count</code> with a
+      <code>childAspectRatio</code>.</b> Aspect ratio ties height to width, so on
+      a wide screen the tiles grow taller while every other card keeps its
+      content height — an inflated row above everything else.
+    </p>
+  </div>
+  <pre><code>KiteStatGrid(
+  height: 200,          // constant at every viewport width
+  minTileWidth: 220,
+  children: [ /* tiles */ ],
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteSeparator</h3>
+  <pre><code>const KiteSeparator()                  // horizontal
+const KiteSeparator(vertical: true)</code></pre>
+</div>
+
+<h2>Data display</h2>
+
+<div class="api">
+  <h3>KiteDataTable</h3>
+  <p>
+    A themed <code>trina_grid</code>. Columns share the available width, currency
+    columns keep numeric sort, and an explicit trailing action column opens a row.
+  </p>
+  <pre><code>KiteDataTable(
+  paginate: false,                      // false when you page server-side
+  onRowTap: (i) =&gt; context.go('/orders/${rows[i]['id']}'),
+  columns: [
+    TrinaColumn(
+      title: 'Total',
+      field: 'total',
+      readOnly: true,
+      textAlign: TrinaColumnTextAlign.end,
+      type: TrinaColumnType.currency(symbol: r'$', decimalDigits: 2),
+    ),
+  ],
+  rows: [
+    TrinaRow(cells: {'total': TrinaCell(value: 1264.55)}),
+  ],
+)</code></pre>
+  <div class="note">
+    <p>
+      <b>Row opening is an explicit action column, not double-tap.</b> Double-tap
+      is undiscoverable, and on desktop <code>trina_grid</code> detects it with a
+      manual timing window that is easy to miss. Double-tap still works for
+      anyone who tries it.
+    </p>
+  </div>
+</div>
+
+<div class="api">
+  <h3>KiteBadge <span class="pill">KiteTone</span></h3>
+  <p>Status. Tone is semantic and separate from the brand accent.</p>
+  <pre><code>const KiteBadge('Paid', tone: KiteTone.success)
+const KiteBadge('Pending', tone: KiteTone.warning)
+const KiteBadge('Cancelled', tone: KiteTone.danger)
+const KiteBadge('Refunded', tone: KiteTone.info)
+const KiteBadge('Draft')                            // neutral</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteAvatar</h3>
+  <p>Falls back to initials, which is the common case — admin tables rarely have photographs.</p>
+  <pre><code>const KiteAvatar(name: 'Ada Lovelace', size: 32)
+const KiteAvatar(name: 'Ada Lovelace', src: 'https://…')</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteMeter</h3>
+  <p>A labelled progress bar with the value in tabular figures.</p>
+  <pre><code>const KiteMeter(label: 'Storage used', value: 0.72, trailing: '72 of 100 GB')</code></pre>
+</div>
+
+<h2>Charts</h2>
+
+<div class="api">
+  <h3>KiteLineChart</h3>
+  <p>Faint horizontal grid, area fill, no axis furniture competing with the data. Tooltips take a formatter.</p>
+  <pre><code>KiteLineChart(
+  spots: [for (var i = 0; i &lt; values.length; i++) (i.toDouble(), values[i])],
+  valueLabel: (v) =&gt; KiteFormat.money(v),
+)</code></pre>
+  <div class="note">
+    <p><b>Always pass <code>valueLabel</code>.</b> Without it a hover prints the raw double — <code>74.81973839205</code>.</p>
+  </div>
+</div>
+
+<div class="api">
+  <h3>KiteSparkline</h3>
+  <p>Trend without axes. Leave <code>height</code> null inside an <code>Expanded</code> and it fills its slot.</p>
+  <pre><code>Expanded(child: KiteSparkline(values: spark, color: accent))</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteDonut <span class="pill">KiteSlice</span></h3>
+  <p>Total in the hole, labels in the legend — labels on the arcs collide once a slice drops below about 5%.</p>
+  <pre><code>KiteDonut(
+  centerLabel: 'orders',
+  centerValue: KiteFormat.count(3412),
+  slices: const [
+    KiteSlice(label: 'Paid', value: 1412, color: Color(0xFF0C6B62)),
+    KiteSlice(label: 'Pending', value: 604, color: Color(0xFFC08A19)),
+  ],
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteBarRow</h3>
+  <p>Ranked categories — answers "which is biggest" faster than a pie.</p>
+  <pre><code>KiteBarRow(label: 'Direct', value: 20460, max: 20460, display: '42%')</code></pre>
+</div>
+
+<h2>Actions</h2>
+
+<div class="api">
+  <h3>KiteButton <span class="pill">6 variants</span></h3>
+  <pre><code>KiteButton(onPressed: save, child: const Text('Save'))
+KiteButton.secondary(…)   KiteButton.outline(…)
+KiteButton.ghost(…)       KiteButton.destructive(…)
+
+KiteButton(
+  leading: const Icon(Icons.download, size: 16),
+  expands: true,          // fill the parent's width
+  enabled: !busy,         // dims as well as disabling
+  onPressed: export,
+  child: const Text('Export'),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteMenu <span class="pill">KiteMenuItem</span></h3>
+  <p>A dropdown anchored to its trigger. Closes itself before running a callback, so a menu item that navigates cannot leave a popover over the next screen.</p>
+  <pre><code>KiteMenu(
+  width: 248,
+  header: const Text('Signed in as Ada'),
+  items: [
+    KiteMenuItem(label: 'Profile', icon: Icons.person_outline, onPressed: …),
+    KiteMenuItem(label: 'Theme', icon: Icons.palette_outlined, trailing: 'Slate', onPressed: …),
+    const KiteMenuItem.separator(),
+    KiteMenuItem(label: 'Sign out', icon: Icons.logout, destructive: true, onPressed: …),
+  ],
+  trigger: (context, open) =&gt; IconButton(icon: …, onPressed: open),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteTooltip</h3>
+  <pre><code>KiteTooltip(message: 'Notifications', child: IconButton(…))</code></pre>
+</div>
+
+<h2>Overlays and feedback</h2>
+
+<div class="api">
+  <h3>KiteToast</h3>
+  <p>A control that says what it will do should be followed by a message saying it happened.</p>
+  <pre><code>KiteToast.show(
+  context,
+  title: 'Order deleted',
+  description: 'You can restore it from the archive for 30 days.',
+  tone: KiteTone.danger,
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>kiteConfirm</h3>
+  <p>Destructive confirmation. Returns true <em>only</em> on an explicit confirm — dismissing resolves to false, never to yes.</p>
+  <pre><code>final ok = await kiteConfirm(
+  context,
+  title: 'Delete #10004?',
+  message: 'This removes the record permanently and cannot be undone.',
+);
+if (!ok || !context.mounted) return;</code></pre>
+</div>
+
+<div class="api">
+  <h3>kiteSheet</h3>
+  <p>Right-hand detail drawer — inspect a row without losing your place in the table.</p>
+  <pre><code>kiteSheet&lt;void&gt;(
+  context,
+  title: '#10004',
+  description: 'Placed 24 August by Ada Lovelace.',
+  body: Column(children: […]),
+  actions: [KiteButton.outline(…), KiteButton.destructive(…)],
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteAlert</h3>
+  <p>Inline notice for state the page has to explain.</p>
+  <pre><code>const KiteAlert(
+  title: 'Low stock on 3 products',
+  description: 'Reorder before Friday to avoid backorders.',
+  tone: KiteTone.warning,
+)</code></pre>
+</div>
+
+<h2>Forms</h2>
+
+<div class="api">
+  <h3>KiteField</h3>
+  <p>The labelled wrapper. Labels sit outside the control so they never move; errors say what went wrong and how to fix it.</p>
+  <pre><code>KiteField(
+  label: 'Contact email',
+  hint: 'Used for stock alerts only.',
+  error: errors['email'],
+  child: KiteInput(controller: email, keyboardType: TextInputType.emailAddress),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteInput · KiteTextarea</h3>
+  <pre><code>KiteInput(
+  controller: search,
+  placeholder: 'Search orders…',
+  leading: Icon(Icons.search, size: 16, color: c.mutedForeground),
+  onChanged: (v) =&gt; …,
+)
+
+KiteTextarea(controller: notes, placeholder: 'Optional')</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteSelect&lt;T&gt;</h3>
+  <pre><code>KiteSelect&lt;String&gt;(
+  options: const ['Paid', 'Pending', 'Refunded'],
+  labelOf: (v) =&gt; v,
+  value: status,
+  placeholder: 'Choose one',
+  onChanged: (v) =&gt; setState(() =&gt; status = v),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteCheckbox · KiteSwitch</h3>
+  <p>Both take a label and an optional sublabel, so the control explains itself.</p>
+  <pre><code>KiteSwitch(
+  value: notify,
+  label: 'Email me when stock runs low',
+  sublabel: 'At most one message a day.',
+  onChanged: (v) =&gt; setState(() =&gt; notify = v),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>KiteSlider · KiteDatePicker</h3>
+  <pre><code>KiteSlider(value: discount, min: 0, max: 100, onChanged: …)
+
+KiteDatePicker(
+  selected: shipDate,
+  placeholder: 'Pick a date',
+  onChanged: (d) =&gt; setState(() =&gt; shipDate = d),
+)</code></pre>
+</div>
+
+<h2>States</h2>
+
+<div class="api">
+  <h3>LoadingState · EmptyState · ErrorState</h3>
+  <p>From <code>shared/widgets/states.dart</code>. Free templates habitually stop at the happy path.</p>
+  <pre><code>async.when(
+  loading: () =&gt; const LoadingState(),
+  error: (e, _) =&gt; ErrorState(message: '$e', onRetry: () =&gt; ref.invalidate(p)),
+  data: (result) =&gt; result.rows.isEmpty
+      ? EmptyState(
+          title: 'Nothing matches those filters',
+          message: 'Try clearing the search or choosing a different status.',
+          actionLabel: 'Reset filters',
+          onAction: reset,
+        )
+      : …,
+)</code></pre>
+</div>
+    <nav class="pager"><a class="prev" href="theming.html"><span>Previous</span>Theming</a><a class="next" href="i18n.html"><span>Next</span>Localisation</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screens</title>
+<meta name="description" content="Every screen Kite ships, what each is for, and which are load-bearing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html" class="here">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Screens</h1>
+<p class="lead">Every screen Kite ships, and which ones are load-bearing.</p>
+
+<p>
+  Volume is not the differentiator — a competitor ships fourteen dashboards.
+  Four of these carry the product; the rest is expected furniture that has to
+  exist so nobody can call it incomplete.
+</p>
+
+<h2>Dashboards</h2>
+<table>
+  <thead><tr><th>Screen</th><th>Route</th><th>What it is for</th></tr></thead>
+  <tbody>
+    <tr><td>Analytics</td><td><code>/</code></td><td>Revenue, funnel, channels, top products, activity, recent orders, status donut. Seven distinct shapes — a page of identical cards reads as filler.</td></tr>
+    <tr><td>Projects</td><td><code>/projects</code></td><td>Answers "is the work on track" rather than "how much money" — milestones, workload, burndown, issue mix, releases, risks.</td></tr>
+  </tbody>
+</table>
+
+<h2>Resources <span class="pill">load-bearing</span></h2>
+<p>
+  One set of screens serves orders, customers and products. See
+  <a href="resources.html">Adding a resource</a>.
+</p>
+<table>
+  <thead><tr><th>Screen</th><th>Route</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>List</td><td><code>/orders</code></td><td>Server-side paging, search and status filters. Currency columns keep numeric sort. Row action opens the record.</td></tr>
+    <tr><td>Detail</td><td><code>/orders/:id</code></td><td>Addressable — a real URL you can send someone. Breadcrumb, tone-coded status, edit and delete.</td></tr>
+    <tr><td>Create / edit</td><td><code>/orders/new</code>, <code>/orders/:id/edit</code></td><td>One screen. The only difference is whether an id was supplied.</td></tr>
+  </tbody>
+</table>
+
+<h2>Auth <span class="pill">load-bearing</span></h2>
+<p>
+  Sign in, sign up, forgot password, OTP and lock — at <code>/sign-in</code>,
+  <code>/sign-up</code>, <code>/forgot-password</code>, <code>/verify</code> and
+  <code>/lock</code>. Wired to a real route guard, not decorative forms.
+</p>
+
+<h2>Apps</h2>
+<table>
+  <thead><tr><th>Screen</th><th>Route</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Inbox</td><td><code>/inbox</code></td><td>Split list/detail with unread weighting and a star toggle. On mobile the detail is a full-screen push, not a squeezed column.</td></tr>
+    <tr><td>Board</td><td><code>/board</code></td><td>Real drag-and-drop between columns, with counts updating. Most free Flutter kanbans cannot be dragged.</td></tr>
+    <tr><td>Calendar</td><td><code>/calendar</code></td><td>Month view with an agenda — severity stripes and attendee avatars.</td></tr>
+    <tr><td>Chat</td><td><code>/chat</code></td><td>Conversation list with presence, bubbles that know their side, a composer that appends and scrolls.</td></tr>
+  </tbody>
+</table>
+
+<h2>Build</h2>
+<table>
+  <thead><tr><th>Screen</th><th>Route</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Components</td><td><code>/components</code></td><td>The showcase. Every control is real and stateful — flip the switches, drag the slider, open the drawer.</td></tr>
+    <tr><td>Forms</td><td><code>/forms</code></td><td>Every input with real validation, which is where most free templates stop.</td></tr>
+    <tr><td>Wizard</td><td><code>/wizard</code></td><td>Four steps. You cannot advance past an invalid step, and going back never loses what you typed.</td></tr>
+    <tr><td>Settings</td><td><code>/settings</code></td><td>Theme, accent, language, account, data source.</td></tr>
+    <tr><td>Profile</td><td><code>/profile</code></td><td>Identity, editable details, notification switches, danger zone.</td></tr>
+  </tbody>
+</table>
+
+<h2>System</h2>
+<p>
+  <code>404</code> for anything unrouted, and <code>/500</code> for server
+  errors. They are separate screens on purpose: a 404 says "this does not
+  exist", a 500 says "it exists and we broke it" — different message, different
+  recovery.
+</p>
+
+<h2>States</h2>
+<p>
+  Every data-backed screen has honest empty, loading and error states from
+  <code>shared/widgets/states.dart</code>. Free templates habitually stop at the
+  happy path; these three are the difference between a screenshot and something
+  shippable.
+</p>
+    <nav class="pager"><a class="prev" href="structure.html"><span>Previous</span>Project structure</a><a class="next" href="data.html"><span>Next</span>Data layer</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

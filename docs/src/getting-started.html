@@ -1,0 +1,64 @@
+<h1>Getting started</h1>
+<p class="lead">Clone, run, and find your way around in about five minutes.</p>
+
+<h2>Requirements</h2>
+<table>
+  <thead><tr><th>Tool</th><th>Version</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Flutter</td><td>3.47+</td><td>Dart 3.13 comes with it</td></tr>
+    <tr><td>Xcode</td><td>16+</td><td>iOS and macOS builds only</td></tr>
+    <tr><td>Android SDK</td><td>34+</td><td>Android builds only</td></tr>
+  </tbody>
+</table>
+<p>
+  Nothing else. No code generation step, no <code>build_runner</code>, no
+  environment file to fill in before the app will start.
+</p>
+
+<h2>Run it</h2>
+<pre><code>git clone https://github.com/ColorlibHQ/kite-flutter-admin-dashboard
+cd kite-flutter-admin-dashboard
+flutter pub get
+flutter run</code></pre>
+<p>
+  Sign in with any email — the field is prefilled and the session is in-memory,
+  so a page reload signs you out again. That is deliberate: see
+  <a href="state.html">State</a>.
+</p>
+
+<h2>Pinning the SDK</h2>
+<p>
+  Kite pins Flutter with <a href="https://fvm.app">fvm</a> so local builds match
+  what CI builds. If you use it:
+</p>
+<pre><code>fvm use 3.47.1
+fvm flutter run</code></pre>
+
+<h2>First things to look at</h2>
+<div class="cards">
+  <a href="components.html"><b>The Components screen</b><span>Every control in the template, live and stateful. The fastest way to see what is here.</span></a>
+  <a href="data.html"><b>lib/core/data/</b><span>The DataProvider contract and the mock adapter. One line swaps it for your backend.</span></a>
+  <a href="structure.html"><b>lib/kite_ui/</b><span>The design layer. The one architectural rule lives here.</span></a>
+</div>
+
+<h2>Try the command palette</h2>
+<p>
+  Press <code>⌘K</code> (or <code>Ctrl+K</code>) anywhere. It searches the real
+  data through <code>DataProvider</code>, not a hardcoded list — point Kite at a
+  REST backend and search hits that backend with no work in the palette.
+</p>
+
+<h2>Everyday commands</h2>
+<pre><code>flutter run -d chrome          # web
+flutter run -d macos           # desktop
+flutter test                   # 26 tests
+flutter analyze                # strict: casts, inference, raw types
+dart format .                  # CI checks the whole tree, not just lib/</code></pre>
+
+<div class="note">
+  <p>
+    <b>Run <code>dart format .</code> from the project root, not
+    <code>dart format lib/</code>.</b> CI checks everything including
+    <code>test/</code>, and this is the most common reason a first push fails.
+  </p>
+</div>

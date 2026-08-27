@@ -1,0 +1,103 @@
+<h1>Deploying</h1>
+<p class="lead">Build, shrink, ship.</p>
+
+<h2>Build</h2>
+<pre><code>flutter build web --wasm --release --base-href /kite/
+node tools/strip-fonts.mjs build/web
+python3 tools/subset-lucide.py build/web</code></pre>
+<p>
+  <code>--base-href</code> must match the path you serve from, or every asset
+  404s. Omit it when serving from a domain root.
+</p>
+
+<h2>The two font tools</h2>
+<p>They are not optional; together they take the payload from about 2.2 MB to 1.6 MB.</p>
+
+<div class="api">
+  <h3>strip-fonts.mjs</h3>
+  <p>
+    <code>shadcn_ui</code> depends on <code>lucide_icons_flutter</code>, which
+    declares <strong>seven</strong> font families — a base face plus six
+    variable-weight instances. Flutter web preloads every family named in
+    <code>FontManifest.json</code>, so all seven download on first paint even
+    though nothing references the numbered weights.
+  </p>
+  <p>Saves about 1.15 MB.</p>
+</div>
+
+<div class="api">
+  <h3>subset-lucide.py</h3>
+  <p>
+    Then subsets the base face to the glyphs actually drawn.
+    <code>--tree-shake-icons</code> only manages ~12% here, because shadcn reaches
+    its icons through wrappers that defeat Flutter's static analysis — but it
+    only ever draws eleven of them.
+  </p>
+  <p><strong>1,776 glyphs to 12. 732 KB to 2 KB.</strong> Needs <code>pip install fonttools</code>.</p>
+</div>
+
+<div class="note warn">
+  <p>
+    <b>Keep the base Lucide family.</b> Dropping it entirely leaves tofu boxes
+    where shadcn's own chevrons and checkmarks should be. The tools keep exactly
+    one family; CI fails the build if that count changes in either direction.
+  </p>
+</div>
+
+<h2>Measuring</h2>
+<p>
+  Do not measure by summing <code>build/web</code>. It ships six
+  mutually-exclusive renderer variants plus <code>.symbols</code> debug files —
+  the directory total is roughly 5.5× what a browser actually downloads.
+</p>
+<pre><code>npm i playwright &amp;&amp; npx playwright install chromium
+node tools/measure-bundle.mjs build/web "label" throttle</code></pre>
+<p>
+  That serves the build, loads it in headless Chromium and reports real encoded
+  transfer plus FCP, throttled to Fast 4G with 4× CPU.
+</p>
+
+<h2>Any static host</h2>
+<p>
+  Serve <code>build/web</code>. The only requirement is the
+  <code>index.html</code> fallback for unknown paths — Cloudflare Pages, Netlify
+  and Vercel do it by default. Locally:
+</p>
+<pre><code>node tools/serve.mjs build/web 8722</code></pre>
+<p>
+  <code>python3 -m http.server</code> will not do: it serves <code>.wasm</code>
+  as <code>octet-stream</code> and the app refuses to boot.
+</p>
+
+<h2>Cloudflare R2</h2>
+<p>
+  How this project deploys. <code>rclone sync</code> deletes remote files missing
+  from the source — dry-run first, every time.
+</p>
+<pre><code>rclone sync build/web/ r2pro:dashboardpack-demos/kite/ --dry-run
+rclone sync build/web/ r2pro:dashboardpack-demos/kite/
+rclone check build/web/ r2pro:dashboardpack-demos/kite/    # expect "0 differences"
+
+ssh hetzner sudo cf-purge-url https://demo.dashboardpack.com/kite/</code></pre>
+<p>
+  Cloudflare caches per colo, so replacing a file without purging means visitors
+  keep the old one. See <code>docs/DEPLOY.md</code> in the repo for the docs
+  bucket and the SEO worker's behaviour.
+</p>
+
+<h2>CI</h2>
+<p>Every push runs eleven jobs:</p>
+<table>
+  <thead><tr><th>Job</th><th>Checks</th></tr></thead>
+  <tbody>
+    <tr><td><code>analyze</code></td><td><code>dart format --set-exit-if-changed .</code> then <code>flutter analyze --fatal-infos</code></td></tr>
+    <tr><td><code>test</code></td><td>26 tests with coverage</td></tr>
+    <tr><td><code>architecture</code></td><td>No <code>shadcn_ui</code> import outside <code>lib/kite_ui/</code></td></tr>
+    <tr><td><code>fonts</code></td><td>Exactly one Lucide family survives the build</td></tr>
+    <tr><td><code>build</code> ×6</td><td>web-wasm, web-js, iOS, Android, macOS, Windows</td></tr>
+    <tr><td><code>size</code></td><td>App payload under budget</td></tr>
+  </tbody>
+</table>
+<p>
+  A weekly scheduled run catches Flutter SDK drift before a user reports it.
+</p>

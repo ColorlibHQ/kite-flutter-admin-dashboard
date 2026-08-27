@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Platforms</title>
+<meta name="description" content="Per-platform notes for web, iOS, Android, macOS and Windows.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html" class="here">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Platforms</h1>
+<p class="lead">One codebase, six build targets. What differs on each.</p>
+
+<p>CI builds all six on every push, so a break shows up before a user finds it.</p>
+<pre><code>flutter build web --wasm --release
+flutter build web --release          # JS fallback
+flutter build apk --release
+flutter build ios --release
+flutter build macos --release
+flutter build windows --release</code></pre>
+
+<h2>Web</h2>
+<p>
+  Two renderers. <code>--wasm</code> compiles to WebAssembly and uses skwasm;
+  browsers without WasmGC fall back to the JS build automatically. WasmGC
+  covers roughly 92% of traffic — Chrome 119+, Firefox 120+, Edge 119+, Safari
+  18.2+.
+</p>
+<p>
+  Around <strong>1.6 MB gzipped</strong> of app payload, plus
+  <code>skwasm.wasm</code> served from Google's CDN and cached across every
+  Flutter site a visitor has used. See <a href="deploy.html">Deploying</a> for
+  the font tools that get it there.
+</p>
+<div class="note warn">
+  <p>
+    <b>Kite uses path URLs, so the host must serve <code>index.html</code> for
+    unknown paths</b> — otherwise refreshing <code>/orders/10004</code> is a 404.
+  </p>
+  <p>
+    <b>Core Web Vitals cannot score a Flutter app.</b> It renders to a canvas, so
+    there is no LCP-eligible element and <code>PerformanceObserver</code> reports
+    zero. Use FCP and time-to-interactive. Irrelevant behind a login, but do not
+    let anyone quote you a CWV number.
+  </p>
+</div>
+
+<h2>Mobile</h2>
+<p>
+  The layouts are genuinely different, not reflowed: the shell swaps its sidebar
+  for a bottom bar and drawer, the inbox pushes a full-screen detail rather than
+  squeezing a second column, and the board scrolls horizontally.
+</p>
+<p>
+  Flutter 3.38+ requires the Apple <strong>UIScene lifecycle</strong>; the
+  generated iOS project already has it. If you regenerate platform folders from
+  an older template, follow Flutter's UIScene migration guide.
+</p>
+<table>
+  <thead><tr><th>Task</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td>App icon</td><td><code>ios/Runner/Assets.xcassets</code>, <code>android/app/src/main/res/mipmap-*</code></td></tr>
+    <tr><td>Display name</td><td><code>ios/Runner/Info.plist</code>, <code>android/app/src/main/AndroidManifest.xml</code></td></tr>
+    <tr><td>Bundle id</td><td>Xcode target settings, <code>android/app/build.gradle</code></td></tr>
+    <tr><td>Signing</td><td>Xcode; <code>android/key.properties</code></td></tr>
+  </tbody>
+</table>
+<p>
+  Kite ships no network permissions of its own — the mock provider makes no
+  requests. Add <code>INTERNET</code> to the Android manifest and any ATS
+  exceptions to <code>Info.plist</code> when you point it at a real backend.
+</p>
+
+<h2>Desktop</h2>
+<p>
+  macOS and Windows build unchanged. On macOS, network access needs the
+  entitlement — again, only once you have a real backend:
+</p>
+<pre><code>&lt;!-- macos/Runner/DebugProfile.entitlements and Release.entitlements --&gt;
+&lt;key&gt;com.apple.security.network.client&lt;/key&gt;
+&lt;true/&gt;</code></pre>
+<p>
+  Window title and minimum size are in <code>macos/Runner/MainFlutterWindow.swift</code>
+  and <code>windows/runner/main.cpp</code>. The desktop layout is the desktop web
+  layout; nothing branches on platform.
+</p>
+
+<h2>Keyboard</h2>
+<p>
+  <code>⌘K</code> on macOS and <code>Ctrl+K</code> elsewhere opens the command
+  palette; both are bound, so no platform check is needed. Bindings live on the
+  shell in <code>app_shell.dart</code>, which means they work from any screen
+  behind the guard.
+</p>
+    <nav class="pager"><a class="prev" href="i18n.html"><span>Previous</span>Localisation</a><a class="next" href="deploy.html"><span>Next</span>Deploying</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<h1>Localisation</h1>
+<p class="lead">Five locales, right-to-left, and the widgets that keep layout honest.</p>
+
+<h2>What ships</h2>
+<p>
+  English, Spanish, French, Japanese and Arabic. Sources are
+  <code>lib/l10n/app_*.arb</code>; the generated Dart lands in
+  <code>lib/l10n/</code> and is committed, so the repo builds without an extra
+  step.
+</p>
+<pre><code>flutter gen-l10n</code></pre>
+
+<h2>Using a string</h2>
+<pre><code>final l = L.of(context);
+Text(l.actionSave);
+Text(l.pageOf(page, pages));   // placeholders are typed</code></pre>
+
+<h2>Adding a string</h2>
+<ol>
+  <li>Add the key to <code>lib/l10n/app_en.arb</code>, with an <code>@key</code> entry if it takes placeholders.</li>
+  <li>Add it to the other four <code>.arb</code> files.</li>
+  <li>Run <code>flutter gen-l10n</code>.</li>
+</ol>
+
+<h2>Adding a locale</h2>
+<ol>
+  <li>Copy <code>app_en.arb</code> to <code>app_&lt;code&gt;.arb</code> and translate.</li>
+  <li>Add a case to <code>KiteLocale</code> in <code>lib/core/l10n/locale_controller.dart</code>, with its native name — the picker shows native names, since someone looking for their language is not reading English.</li>
+  <li>Run <code>flutter gen-l10n</code>.</li>
+</ol>
+
+<h2>Right-to-left</h2>
+<div class="note warn">
+  <p>
+    <b>Arabic is included on purpose.</b> It is the cheapest way to keep the
+    layout honest — a UI that has never rendered right-to-left is usually full
+    of hard-coded left padding nobody noticed.
+  </p>
+  <p>
+    Switching Kite to Arabic the first time exposed exactly that: every
+    <code>Align</code>, padding and border in the app was LTR-literal.
+  </p>
+</div>
+<p>Use the directional variants in anything you add:</p>
+<table>
+  <thead><tr><th>Instead of</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>Alignment.topLeft</code></td><td><code>AlignmentDirectional.topStart</code></td></tr>
+    <tr><td><code>Alignment.centerLeft</code></td><td><code>AlignmentDirectional.centerStart</code></td></tr>
+    <tr><td><code>EdgeInsets.only(left:)</code></td><td><code>EdgeInsetsDirectional.only(start:)</code></td></tr>
+    <tr><td><code>Border(right:)</code></td><td><code>BorderDirectional(end:)</code></td></tr>
+    <tr><td><code>Positioned(right:)</code></td><td><code>PositionedDirectional(end:)</code></td></tr>
+  </tbody>
+</table>
+<p>
+  <code>Row</code>, <code>Padding.symmetric</code> and <code>Expanded</code> are
+  already direction-aware. The trap is only the ones naming a physical side.
+</p>
+
+<h2>Coverage</h2>
+<p>
+  Honestly stated: navigation, shell chrome, settings and the auth strings are
+  localised. Screen bodies still hold English literals — the infrastructure and
+  the pattern are in place, and extraction from here is mechanical rather than
+  design work.
+</p>
+
+<h2>Formatting</h2>
+<p>
+  <code>KiteFormat</code> wraps <code>intl</code> for money and counts. It
+  currently pins a symbol; for a multi-currency app, pass the locale through
+  and let <code>NumberFormat.currency</code> resolve it.
+</p>
+<pre><code>KiteFormat.money(1264.55)   // $1,264.55
+KiteFormat.count(3412)      // 3,412</code></pre>

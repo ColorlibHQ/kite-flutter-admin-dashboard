@@ -1,0 +1,72 @@
+<h1>State</h1>
+<p class="lead">The Riverpod patterns Kite uses — and the ones it avoids.</p>
+
+<h2>Riverpod 3, no code generation</h2>
+<p>
+  Codegen is deliberately off. A template is read far more than it is extended,
+  and <code>part 'x.g.dart'</code> plus a <code>build_runner</code> step is a
+  wall between a reader and what the code does. Every provider here is written
+  by hand and visible.
+</p>
+
+<h2>The providers</h2>
+<table>
+  <thead><tr><th>Provider</th><th>Type</th><th>Holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>dataProvider</code></td><td><code>Provider</code></td><td>The <code>DataProvider</code> implementation — the one line you swap</td></tr>
+    <tr><td><code>sessionProvider</code></td><td><code>NotifierProvider</code></td><td>The signed-in user, or null</td></tr>
+    <tr><td><code>themeProvider</code></td><td><code>NotifierProvider</code></td><td>Theme mode and accent</td></tr>
+    <tr><td><code>localeProvider</code></td><td><code>NotifierProvider</code></td><td>Active locale</td></tr>
+    <tr><td><code>listParamsProvider</code></td><td><code>NotifierProvider</code></td><td>Query state per resource</td></tr>
+    <tr><td><code>listProvider</code></td><td><code>FutureProvider.family</code></td><td>A page of rows, keyed by resource</td></tr>
+    <tr><td><code>recordProvider</code></td><td><code>FutureProvider.family</code></td><td>One record, keyed by (resource, id)</td></tr>
+  </tbody>
+</table>
+
+<h2>What Kite avoids</h2>
+<div class="note">
+  <p>
+    <b><code>StateProvider</code> is legacy in Riverpod 3</b> and is not used
+    here. Query state is a single <code>Notifier</code> holding a map keyed by
+    resource — fewer moving parts to explain than a provider family, and a
+    template should not teach a deprecated API.
+  </p>
+</div>
+<pre><code>class ListParamsController extends Notifier&lt;Map&lt;String, ListParams&gt;&gt; {
+  @override
+  Map&lt;String, ListParams&gt; build() =&gt; const {};
+
+  ListParams of(String resource) =&gt; state[resource] ?? initial;
+  void update(String resource, ListParams p) =&gt; state = {...state, resource: p};
+  void reset(String resource) =&gt; update(resource, initial);
+}</code></pre>
+
+<h2>Refetching</h2>
+<p>
+  <code>listProvider</code> watches <code>listParamsProvider</code>, so changing
+  the search, a filter or the page refetches automatically. After a mutation,
+  invalidate explicitly:
+</p>
+<pre><code>await ref.read(dataProvider).delete(resource, id);
+ref.invalidate(listProvider(resource));
+ref.invalidate(recordProvider((resource, id)));</code></pre>
+
+<h2>The session is in-memory on purpose</h2>
+<p>
+  Signing in sets a <code>SessionUser</code>; reloading the page signs you out.
+  Persisting it would mean picking a storage package and a token format on your
+  behalf — decisions that belong to your auth provider, not to a template.
+</p>
+<p>
+  Swap <code>SessionController.signIn</code> for a real call and the guard,
+  redirects and every screen keep working unchanged. If you want persistence,
+  that method and <code>build()</code> are the two places to touch.
+</p>
+
+<h2>Local widget state stays local</h2>
+<p>
+  Form fields, toggles, the selected kanban column, which inbox message is open
+  — all <code>StatefulWidget</code>. Riverpod is for state that outlives a
+  screen or is shared across them. Putting a text controller in a provider buys
+  nothing and costs a rebuild.
+</p>

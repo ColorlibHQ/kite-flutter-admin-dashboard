@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project structure</title>
+<meta name="description" content="How Kite is laid out, and the one architectural rule that matters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html" class="here">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Project structure</h1>
+<p class="lead">How Kite is laid out, and the one architectural rule that matters.</p>
+
+<pre><code>lib/
+├── main.dart          usePathUrlStrategy() + ProviderScope
+├── app.dart           ShadApp.router, theme and locale wiring
+├── kite_ui/           the ONLY folder that imports the design library
+│   ├── _shadcn.dart   single import surface — the swap point
+│   ├── tokens.dart    KiteSpace, KiteRadius, KiteBreak, KiteColors, KiteText
+│   └── …              button, card, chart, data_table, menu, inputs, …
+├── core/
+│   ├── router/        routes.dart (paths + nav) and app_router.dart
+│   ├── theme/         light + dark × 3 accents
+│   ├── data/          DataProvider + mock / REST / Supabase adapters
+│   ├── auth/          session controller, guard wiring
+│   └── l10n/          locale controller
+├── l10n/              .arb sources and generated localisations
+├── shared/
+│   ├── layout/        AppShell — sidebar, top bar, mobile bottom bar
+│   └── widgets/       empty, loading and error states
+└── features/          one folder per screen group</code></pre>
+
+<h2>The one rule</h2>
+<div class="note warn">
+  <p>
+    <b>No <code>shadcn_ui</code> type may appear outside
+    <code>lib/kite_ui/</code>.</b>
+  </p>
+  <p>
+    It is a pre-1.0 library (0.55.x, capped by <code>trina_grid</code>) that
+    ships breaking changes. Confining it means the blast radius of an upgrade is
+    one folder rather than every screen. Features import Kite widgets; Kite
+    widgets import the design library.
+  </p>
+</div>
+<p>
+  CI enforces this with a grep, so it cannot quietly rot:
+</p>
+<pre><code>if grep -rn --include='*.dart' "package:shadcn_ui" lib | grep -v '^lib/kite_ui/'; then
+  echo "::error::shadcn_ui imported outside lib/kite_ui/"
+  exit 1
+fi</code></pre>
+<p>
+  The practical effect: features never name a <code>Shad*</code> type. They read
+  colour through <code>KiteColors.of(context)</code> and type through
+  <code>KiteText.of(context)</code>, both of which are extension types over the
+  design library's own — zero runtime cost, and the only thing that has to
+  change if the library does.
+</p>
+
+<h2>Adding a screen</h2>
+<p>Four edits, in this order:</p>
+<ol>
+  <li>Create <code>lib/features/&lt;group&gt;/&lt;name&gt;_screen.dart</code>.</li>
+  <li>Add a path constant to <code>R</code> in <code>lib/core/router/routes.dart</code>.</li>
+  <li>Add a <code>NavItem</code> to the right <code>NavGroup</code> in the same file, and a case to <code>NavItem.labelOf</code> if it should localise.</li>
+  <li>Add a <code>GoRoute</code> inside the <code>ShellRoute</code> in <code>app_router.dart</code>.</li>
+</ol>
+<p>
+  Screens inside the shell get the sidebar, top bar and auth guard for free.
+  Screens declared outside it (the five auth screens, the 500 page) render
+  standalone.
+</p>
+
+<h2>Why features never import each other</h2>
+<p>
+  Anything two features both need lives in <code>shared/</code> or
+  <code>kite_ui/</code>. It keeps deletion cheap — removing a feature you do not
+  want is deleting its folder and its route, not untangling it from three
+  others.
+</p>
+
+<h2>Tests</h2>
+<pre><code>test/
+├── data_provider_test.dart   the contract: totals, search, filters, sort, mutations
+├── rest_provider_test.dart   both HTTP adapters against a fake client
+├── format_test.dart          money formatting
+└── session_test.dart         sign in, initials, sign out</code></pre>
+<p>
+  26 tests. They cover the parts where being wrong is silent — a
+  <code>total</code> that reports the page length instead of the row count still
+  renders a table, it just paginates wrongly.
+</p>
+    <nav class="pager"><a class="prev" href="getting-started.html"><span>Previous</span>Getting started</a><a class="next" href="screens.html"><span>Next</span>Screens</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

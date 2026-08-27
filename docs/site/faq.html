@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ and troubleshooting</title>
+<meta name="description" content="The traps this build actually hit, and what to do about them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html" class="here">FAQ</a></aside>
+  <main>
+<h1>FAQ and troubleshooting</h1>
+<p class="lead">
+  The traps this build actually hit. Each one cost time to find, so they are
+  written down rather than left for you to rediscover.
+</p>
+
+<h2>Layout</h2>
+
+<div class="api">
+  <h3>My stat cards get taller on wide screens</h3>
+  <p>
+    They are in a <code>GridView</code> with a <code>childAspectRatio</code>,
+    which ties height to width. Use <a href="components.html">KiteStatGrid</a>:
+    fixed height, flexible width.
+  </p>
+  <p>
+    Aspect ratio is right for content that genuinely scales with size —
+    thumbnails, media cards. It is wrong for anything with a fixed amount to say.
+  </p>
+</div>
+
+<div class="api">
+  <h3>My <code>maxWidth</code> is being ignored</h3>
+  <p>
+    <code>SingleChildScrollView</code> passes a <em>tight</em> width constraint,
+    and <code>ConstrainedBox</code> cannot shrink below a tight incoming
+    constraint. Loosen it first:
+  </p>
+  <pre><code>SingleChildScrollView(
+  padding: const EdgeInsets.all(KiteSpace.xl),
+  child: Align(                                  // ← without this, no-op
+    alignment: AlignmentDirectional.topStart,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 960),
+      child: …,
+    ),
+  ),
+)</code></pre>
+</div>
+
+<div class="api">
+  <h3>A card in a Row has dead space at the bottom</h3>
+  <p>
+    Siblings in a <code>Row</code> stretch to match the tallest. Either give the
+    shorter card a footer of supporting facts, or drop the
+    <code>IntrinsicHeight</code> and let each size itself.
+  </p>
+</div>
+
+<div class="api">
+  <h3>My layout breaks in Arabic</h3>
+  <p>
+    Something names a physical side. <code>Alignment.topLeft</code>,
+    <code>EdgeInsets.only(left:)</code>, <code>Border(right:)</code> and
+    <code>Positioned(right:)</code> are all direction-agnostic — they stay
+    physically left even in RTL. See <a href="i18n.html">Localisation</a> for the
+    directional equivalents.
+  </p>
+</div>
+
+<h2>Data and rendering</h2>
+
+<div class="api">
+  <h3>Pagination shows the wrong number of pages</h3>
+  <p>
+    <code>ListResult.total</code> is being set to the page length rather than the
+    row count. See <a href="data.html">Data layer</a> — it comes from
+    <code>X-Total-Count</code> or <code>Content-Range</code>, not
+    <code>rows.length</code>.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Currency sorts wrongly</h3>
+  <p>
+    The value was formatted into a string before reaching the cell, so
+    <code>$9.00</code> sorts after <code>$1,264.55</code>. Use
+    <code>TrinaColumnType.currency</code> and keep the numeric value.
+  </p>
+</div>
+
+<div class="api">
+  <h3>A chart tooltip shows a long decimal</h3>
+  <p>
+    Pass <code>valueLabel</code> to <code>KiteLineChart</code>. Without it, a
+    hover prints the raw double.
+  </p>
+</div>
+
+<div class="api">
+  <h3>"Unsupported operation: Not available for web"</h3>
+  <p>
+    Almost certainly <code>ShadAvatar</code> handed an empty string rather than
+    null — it renders its placeholder only when <code>src</code> is
+    <strong>null</strong>, and a non-null empty string reaches an image loader
+    that has no web implementation. <code>KiteAvatar</code> already guards this.
+  </p>
+</div>
+
+<div class="api">
+  <h3>A disabled button looks enabled</h3>
+  <p>
+    Nulling <code>onPressed</code> is not enough — pass <code>enabled: false</code>,
+    which is what dims it.
+  </p>
+</div>
+
+<h2>Build and CI</h2>
+
+<div class="api">
+  <h3>CI fails on formatting but my code looks fine</h3>
+  <p>
+    You ran <code>dart format lib/</code>. CI runs
+    <code>dart format --set-exit-if-changed .</code> across the whole tree,
+    including <code>test/</code>. Run it from the project root.
+  </p>
+</div>
+
+<div class="api">
+  <h3>The size job fails after I added a screen</h3>
+  <p>
+    Check the composition before raising the budget — fonts and assets are
+    usually the cause, not Dart. If the growth is legitimate, raise
+    <code>WASM_GZIP_BUDGET_KB</code> in the workflow <em>and</em> say why in the
+    commit. The budget exists to make growth visible, not to be moved quietly.
+  </p>
+</div>
+
+<div class="api">
+  <h3>The architecture job fails</h3>
+  <p>
+    Something outside <code>lib/kite_ui/</code> imports
+    <code>package:shadcn_ui</code>. Wrap what you need in
+    <code>kite_ui</code> and import that instead — see
+    <a href="structure.html">the one rule</a>.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Icons render as empty boxes</h3>
+  <p>
+    The font subsetter dropped the base Lucide family. Exactly one must survive;
+    the <code>fonts</code> CI job fails on zero <em>or</em> more than one.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Refreshing a detail page 404s</h3>
+  <p>
+    The host is not falling back to <code>index.html</code> for unknown paths.
+    See <a href="deploy.html">Deploying</a>.
+  </p>
+</div>
+
+<h2>Product questions</h2>
+
+<div class="api">
+  <h3>Can I use forui, or plain Material, instead of shadcn_ui?</h3>
+  <p>
+    Yes — that is what <code>kite_ui</code> is for.
+    <code>lib/kite_ui/_shadcn.dart</code> is the single import surface; change it
+    and reimplement the wrappers. Nothing in <code>features/</code> moves.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Why is the session lost on reload?</h3>
+  <p>
+    It is in-memory on purpose. Persisting it means choosing a storage package
+    and a token format on your behalf — decisions that belong to your auth
+    provider. See <a href="state.html">State</a> for the two methods to change.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Is it really free?</h3>
+  <p>
+    MIT. Commercial use, no attribution required, no asterisk.
+  </p>
+</div>
+
+<div class="api">
+  <h3>Something is missing or wrong here</h3>
+  <p>
+    Open an issue on
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>.
+    If it cost you an hour, it is worth a paragraph in these docs.
+  </p>
+</div>
+    <nav class="pager"><a class="prev" href="deploy.html"><span>Previous</span>Deploying</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

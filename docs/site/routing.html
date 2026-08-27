@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Routing</title>
+<meta name="description" content="go_router shells, the auth guard, nested routes and path URLs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html" class="here">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Routing</h1>
+<p class="lead">go_router 18 — shells, an auth guard, nested routes and path URLs.</p>
+
+<h2>Paths live in one place</h2>
+<p>
+  <code>lib/core/router/routes.dart</code> holds every path as a constant on
+  <code>R</code>, plus the navigation model. The router, the sidebar and every
+  <code>context.go</code> read the same constants, so they cannot drift.
+</p>
+<pre><code>abstract final class R {
+  static const dashboard = '/';
+  static const orders = '/orders';
+  static const settings = '/settings';
+  …
+}</code></pre>
+
+<h2>The shell</h2>
+<p>
+  Everything behind auth renders inside a <code>ShellRoute</code>, so the
+  sidebar and top bar survive navigation instead of rebuilding on every route.
+</p>
+<pre><code>ShellRoute(
+  builder: (context, state, child) =&gt;
+      AppShell(location: state.matchedLocation, child: child),
+  routes: [
+    GoRoute(path: R.dashboard, builder: (_, _) =&gt; const DashboardScreen()),
+    …
+  ],
+)</code></pre>
+<p>
+  The five auth screens and the 500 page are declared <em>outside</em> the shell,
+  so they render standalone.
+</p>
+
+<h2>The guard</h2>
+<pre><code>redirect: (context, state) {
+  final signedIn = ref.read(sessionProvider) != null;
+  final onAuth = R.isAuthRoute(state.matchedLocation);
+  if (!signedIn && !onAuth) return R.signIn;
+  if (signedIn && onAuth) return R.dashboard;
+  return null;
+},</code></pre>
+<p>
+  It runs on every navigation. Signing in or out re-evaluates it immediately
+  rather than on the next navigation, because a small <code>ChangeNotifier</code>
+  bridges the Riverpod session into <code>refreshListenable</code>.
+</p>
+
+<h2>Nested resource routes</h2>
+<p>
+  Generated from one loop, so a fourth resource is a schema entry rather than
+  four declarations:
+</p>
+<pre><code>for (final resource in const ['orders', 'customers', 'products'])
+  GoRoute(
+    path: '/$resource',
+    builder: (_, _) =&gt; ResourceListScreen(resource: resource),
+    routes: [
+      GoRoute(path: 'new', builder: …),
+      GoRoute(
+        path: ':id',
+        builder: (_, state) =&gt; ResourceDetailScreen(
+          resource: resource,
+          id: state.pathParameters['id']!,
+        ),
+        routes: [GoRoute(path: 'edit', builder: …)],
+      ),
+    ],
+  ),</code></pre>
+<div class="note">
+  <p>
+    <b><code>new</code> is declared before <code>:id</code></b> so it matches as
+    a literal rather than being captured as an id. Reversing them routes
+    <code>/orders/new</code> to the detail screen looking for a record called
+    "new".
+  </p>
+</div>
+
+<h2>Path URLs, not hash URLs</h2>
+<p>
+  Flutter web defaults to <code>/#/orders/10004</code>. Kite calls
+  <code>usePathUrlStrategy()</code> in <code>main.dart</code> so the URL is
+  <code>/orders/10004</code> — a page is only linkable and bookmarkable if the
+  URL looks like one.
+</p>
+<div class="note warn">
+  <p>
+    <b>The host must serve <code>index.html</code> for unknown paths</b>, or
+    refreshing a detail page 404s. Cloudflare Pages, Netlify and Vercel do this
+    by default; <code>tools/serve.mjs</code> does it locally. See
+    <a href="deploy.html">Deploying</a>.
+  </p>
+</div>
+
+<h2>The top bar title</h2>
+<p>
+  Resolved by longest-prefix match against <code>kNav</code>, not equality — so
+  <code>/orders/10004/edit</code> still titles as Orders. Exact matching leaves
+  every nested route titled with the app name.
+</p>
+
+<h2>Navigating</h2>
+<pre><code>context.go('/orders/10004');        // replace — the usual case in an admin
+context.push('/orders/10004');      // stack — for a flow you back out of
+Navigator.of(context).pop();        // dismiss a dialog or sheet</code></pre>
+    <nav class="pager"><a class="prev" href="resources.html"><span>Previous</span>Adding a resource</a><a class="next" href="state.html"><span>Next</span>State</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

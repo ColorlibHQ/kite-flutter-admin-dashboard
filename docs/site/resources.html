@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adding a resource</title>
+<meta name="description" content="List, detail, create and edit are generic. A new resource is a schema entry.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html" class="here">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Adding a resource</h1>
+<p class="lead">
+  List, detail, create and edit are generic. A new resource is a schema entry,
+  not four new screens.
+</p>
+
+<h2>1. Describe it</h2>
+<p>In <code>lib/features/resources/resource_schema.dart</code>:</p>
+<pre><code>'invoices': ResourceSpec(
+  name: 'invoices',
+  singular: 'Invoice',
+  titleField: 'number',              // names the record in headings and breadcrumbs
+  statuses: ['Draft', 'Sent', 'Paid', 'Overdue'],
+  fields: [
+    FieldSpec('number', 'Invoice', ColKind.text, editable: false),
+    FieldSpec('client', 'Client', ColKind.text),
+    FieldSpec('amount', 'Amount', ColKind.money),
+    FieldSpec('due', 'Due', ColKind.text),
+    FieldSpec('status', 'Status', ColKind.select,
+        options: ['Draft', 'Sent', 'Paid', 'Overdue']),
+    FieldSpec('notes', 'Notes', ColKind.longText, inList: false),
+  ],
+),</code></pre>
+
+<h2>2. Route it</h2>
+<p>
+  Add the name to the loop in <code>lib/core/router/app_router.dart</code>:
+</p>
+<pre><code>for (final resource in const ['orders', 'customers', 'products', 'invoices'])</code></pre>
+<p>
+  That generates <code>/invoices</code>, <code>/invoices/new</code>,
+  <code>/invoices/:id</code> and <code>/invoices/:id/edit</code>. Then add a
+  <code>NavItem</code> in <code>routes.dart</code>.
+</p>
+
+<h2>What you get for free</h2>
+<table>
+  <thead><tr><th>From the spec</th><th>Drives</th></tr></thead>
+  <tbody>
+    <tr><td><code>inList</code></td><td>Which fields become table columns</td></tr>
+    <tr><td><code>ColKind</code></td><td>Column type, alignment, formatting, and the edit control</td></tr>
+    <tr><td><code>editable</code></td><td>Whether the field appears in the create/edit form</td></tr>
+    <tr><td><code>statuses</code></td><td>The filter chips on the list toolbar</td></tr>
+    <tr><td><code>titleField</code></td><td>Page heading, breadcrumb, delete confirmation, drawer title</td></tr>
+    <tr><td><code>options</code></td><td>The select's choices, and its validation</td></tr>
+  </tbody>
+</table>
+
+<h2>Field kinds</h2>
+<table>
+  <thead><tr><th>ColKind</th><th>List column</th><th>Edit control</th><th>Validation</th></tr></thead>
+  <tbody>
+    <tr><td><code>text</code></td><td>Text, start-aligned</td><td>KiteInput</td><td>Not empty</td></tr>
+    <tr><td><code>number</code></td><td>Number, end-aligned</td><td>Numeric input</td><td>Parses as a number</td></tr>
+    <tr><td><code>money</code></td><td>Currency, end-aligned, numeric sort preserved</td><td>Numeric input</td><td>Parses as a number</td></tr>
+    <tr><td><code>email</code></td><td>Text</td><td>Email keyboard</td><td>Contains <code>@</code></td></tr>
+    <tr><td><code>select</code></td><td>Text, tone-coded badge on detail</td><td>KiteSelect</td><td>A choice was made</td></tr>
+    <tr><td><code>longText</code></td><td>Usually <code>inList: false</code></td><td>KiteTextarea</td><td>Optional</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p>
+    <b>Currency columns keep their numeric value.</b> They render as
+    <code>$1,264.55</code> via <code>TrinaColumnType.currency</code> while
+    sorting numerically. Formatting the value into a string instead would sort
+    <code>$9.00</code> after <code>$1,264.55</code>.
+  </p>
+</div>
+
+<h2>When the generic screens are not enough</h2>
+<p>
+  They are a starting point, not a cage. If invoices need a line-item editor,
+  write <code>lib/features/invoices/</code> and route it directly — the schema
+  approach earns its keep on the resources that are genuinely CRUD, and gets out
+  of the way on the ones that are not.
+</p>
+    <nav class="pager"><a class="prev" href="data.html"><span>Previous</span>Data layer</a><a class="next" href="routing.html"><span>Next</span>Routing</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<h1>Routing</h1>
+<p class="lead">go_router 18 — shells, an auth guard, nested routes and path URLs.</p>
+
+<h2>Paths live in one place</h2>
+<p>
+  <code>lib/core/router/routes.dart</code> holds every path as a constant on
+  <code>R</code>, plus the navigation model. The router, the sidebar and every
+  <code>context.go</code> read the same constants, so they cannot drift.
+</p>
+<pre><code>abstract final class R {
+  static const dashboard = '/';
+  static const orders = '/orders';
+  static const settings = '/settings';
+  …
+}</code></pre>
+
+<h2>The shell</h2>
+<p>
+  Everything behind auth renders inside a <code>ShellRoute</code>, so the
+  sidebar and top bar survive navigation instead of rebuilding on every route.
+</p>
+<pre><code>ShellRoute(
+  builder: (context, state, child) =&gt;
+      AppShell(location: state.matchedLocation, child: child),
+  routes: [
+    GoRoute(path: R.dashboard, builder: (_, _) =&gt; const DashboardScreen()),
+    …
+  ],
+)</code></pre>
+<p>
+  The five auth screens and the 500 page are declared <em>outside</em> the shell,
+  so they render standalone.
+</p>
+
+<h2>The guard</h2>
+<pre><code>redirect: (context, state) {
+  final signedIn = ref.read(sessionProvider) != null;
+  final onAuth = R.isAuthRoute(state.matchedLocation);
+  if (!signedIn && !onAuth) return R.signIn;
+  if (signedIn && onAuth) return R.dashboard;
+  return null;
+},</code></pre>
+<p>
+  It runs on every navigation. Signing in or out re-evaluates it immediately
+  rather than on the next navigation, because a small <code>ChangeNotifier</code>
+  bridges the Riverpod session into <code>refreshListenable</code>.
+</p>
+
+<h2>Nested resource routes</h2>
+<p>
+  Generated from one loop, so a fourth resource is a schema entry rather than
+  four declarations:
+</p>
+<pre><code>for (final resource in const ['orders', 'customers', 'products'])
+  GoRoute(
+    path: '/$resource',
+    builder: (_, _) =&gt; ResourceListScreen(resource: resource),
+    routes: [
+      GoRoute(path: 'new', builder: …),
+      GoRoute(
+        path: ':id',
+        builder: (_, state) =&gt; ResourceDetailScreen(
+          resource: resource,
+          id: state.pathParameters['id']!,
+        ),
+        routes: [GoRoute(path: 'edit', builder: …)],
+      ),
+    ],
+  ),</code></pre>
+<div class="note">
+  <p>
+    <b><code>new</code> is declared before <code>:id</code></b> so it matches as
+    a literal rather than being captured as an id. Reversing them routes
+    <code>/orders/new</code> to the detail screen looking for a record called
+    "new".
+  </p>
+</div>
+
+<h2>Path URLs, not hash URLs</h2>
+<p>
+  Flutter web defaults to <code>/#/orders/10004</code>. Kite calls
+  <code>usePathUrlStrategy()</code> in <code>main.dart</code> so the URL is
+  <code>/orders/10004</code> — a page is only linkable and bookmarkable if the
+  URL looks like one.
+</p>
+<div class="note warn">
+  <p>
+    <b>The host must serve <code>index.html</code> for unknown paths</b>, or
+    refreshing a detail page 404s. Cloudflare Pages, Netlify and Vercel do this
+    by default; <code>tools/serve.mjs</code> does it locally. See
+    <a href="deploy.html">Deploying</a>.
+  </p>
+</div>
+
+<h2>The top bar title</h2>
+<p>
+  Resolved by longest-prefix match against <code>kNav</code>, not equality — so
+  <code>/orders/10004/edit</code> still titles as Orders. Exact matching leaves
+  every nested route titled with the app name.
+</p>
+
+<h2>Navigating</h2>
+<pre><code>context.go('/orders/10004');        // replace — the usual case in an admin
+context.push('/orders/10004');      // stack — for a flow you back out of
+Navigator.of(context).pop();        // dismiss a dialog or sheet</code></pre>

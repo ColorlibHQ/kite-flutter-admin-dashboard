@@ -65,10 +65,12 @@ and robots.txt at the edge for every `*.dashboardpack.com` host. **Never bake
 those into the build** — the edge is the source of truth, and a build that
 ships its own would fight it.
 
-One thing to check if the demo's landing path ever changes: the worker keeps
-demo roots, `/docs*` and the entry paths `/login`, `/dashboard`,
-`/accounts/login` indexable and noindexes everything else. Kite's root
-redirects to `/sign-in`, which is **not** in that list — so either add it to
-`ENTRY_PATHS` in the worker or accept that the indexable page is the root
-itself. Verify with `node infra/workers/demo-canonical/verify-live.mjs` from
-divilab-content-hub.
+**Decided 2026-08-27: leave `ENTRY_PATHS` alone.** Kite's root redirects to
+`/sign-in`, which is not in the worker's entry list — so the indexable page is
+`demo.dashboardpack.com/kite/` itself and every deeper demo path stays
+noindex. That is the wanted outcome and it is the worker's default, so there is
+no worker change and no deploy. `/docs*` remains indexable, which is what the
+docs site needs.
+
+If that ever needs revisiting, verify with
+`node infra/workers/demo-canonical/verify-live.mjs` from divilab-content-hub.

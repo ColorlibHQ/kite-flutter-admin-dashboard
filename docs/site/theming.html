@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theming</title>
+<meta name="description" content="Colour, type, spacing and radius tokens; dark mode and accents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html" class="here">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Theming</h1>
+<p class="lead">Colour, type, spacing and radius tokens — and where to change them.</p>
+
+<h2>Reading the theme</h2>
+<p>
+  Features read through <code>KiteColors</code> and <code>KiteText</code>, never
+  the design library. Both are extension types — zero runtime cost, and the only
+  thing that changes if the library does.
+</p>
+<pre><code>final c = KiteColors.of(context);
+final t = KiteText.of(context);
+
+Container(
+  padding: const EdgeInsets.all(KiteSpace.xl),
+  decoration: BoxDecoration(
+    color: c.card,
+    border: Border.all(color: c.border),
+    borderRadius: KiteRadius.allLg,
+  ),
+  child: Text('Revenue', style: t.muted),
+);</code></pre>
+
+<h2>Colour</h2>
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>background</code></td><td>Page ground</td></tr>
+    <tr><td><code>card</code> / <code>cardForeground</code></td><td>Raised surfaces</td></tr>
+    <tr><td><code>border</code></td><td>Hairlines, dividers, outlines</td></tr>
+    <tr><td><code>primary</code> / <code>primaryForeground</code></td><td>Accent fills and text on them</td></tr>
+    <tr><td><code>muted</code> / <code>mutedForeground</code></td><td>Recessed fills and secondary text</td></tr>
+    <tr><td><code>accent</code></td><td>Hover and selected rows</td></tr>
+    <tr><td><code>destructive</code></td><td>Delete, errors</td></tr>
+    <tr><td><code>ring</code></td><td>Focus outline</td></tr>
+  </tbody>
+</table>
+<div class="note">
+  <p>
+    <b>Semantic tone is separate from the brand accent.</b> Status uses
+    <code>KiteTone</code> — <code>success</code>, <code>warning</code>,
+    <code>danger</code>, <code>info</code>, <code>neutral</code> — so "paid"
+    reads as paid whatever accent is active. Never encode state in the accent
+    colour.
+  </p>
+</div>
+
+<h2>Type</h2>
+<p>
+  <code>h1</code>–<code>h4</code>, <code>p</code>, <code>lead</code>,
+  <code>large</code>, <code>small</code>, <code>muted</code>. Geist for text,
+  Geist Mono for figures.
+</p>
+<pre><code>Text(
+  value,
+  style: t.h3.copyWith(
+    fontFeatures: const [FontFeature.tabularFigures()],
+  ),
+)</code></pre>
+<p>
+  <strong>Use tabular figures anywhere digits line up in a column</strong> —
+  tables, stat tiles, pagination. Proportional digits make a column of numbers
+  ragged.
+</p>
+
+<h2>Spacing and radius</h2>
+<pre><code>KiteSpace.xs   4      KiteRadius.sm   6
+KiteSpace.sm   8      KiteRadius.md   8
+KiteSpace.md   12     KiteRadius.lg   12
+KiteSpace.lg   16
+KiteSpace.xl   24     // section padding
+KiteSpace.xxl  32</code></pre>
+<p>
+  Every gap comes from here, so density is retuned in one file rather than hunted
+  through widgets.
+</p>
+
+<h2>Breakpoints</h2>
+<pre><code>KiteBreak.isMobile(context)    // &lt; 640
+KiteBreak.isTablet(context)    // 640–1024
+KiteBreak.isDesktop(context)   // ≥ 1024</code></pre>
+<p>
+  Used for genuinely different layouts, not squeezed ones — the shell swaps a
+  sidebar for a bottom bar and drawer, and the inbox swaps a split view for a
+  full-screen push.
+</p>
+
+<h2>Dark mode and accents</h2>
+<p>
+  Three accents × light/dark, switchable at runtime from Settings. Add one by
+  extending <code>KiteAccent</code> in <code>lib/core/theme/app_theme.dart</code>:
+</p>
+<pre><code>enum KiteAccent {
+  slate('Slate'),
+  blue('Blue'),
+  violet('Violet'),
+  rose('Rose');          // add here
+
+  ShadColorScheme scheme(Brightness b) =&gt; switch ((this, b)) {
+    (KiteAccent.rose, Brightness.light) =&gt; const ShadRoseColorScheme.light(),
+    (KiteAccent.rose, Brightness.dark)  =&gt; const ShadRoseColorScheme.dark(),
+    …
+  };
+}</code></pre>
+<p>
+  Twelve palettes ship with the design library: slate, blue, green, gray,
+  neutral, orange, red, rose, stone, violet, yellow, zinc.
+</p>
+
+<h2>Swapping the design library</h2>
+<p>
+  <code>lib/kite_ui/_shadcn.dart</code> is the single import surface. To move to
+  <code>forui</code> or plain Material, change that file and reimplement the
+  wrappers around it. Nothing in <code>features/</code> changes — that is the
+  whole point of the
+  <a href="structure.html">one rule</a>.
+</p>
+    <nav class="pager"><a class="prev" href="state.html"><span>Previous</span>State</a><a class="next" href="components.html"><span>Next</span>Components</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>

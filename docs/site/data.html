@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data layer</title>
+<meta name="description" content="The DataProvider contract, the three adapters, and how to point Kite at your own backend.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;650&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 20H3z"/></svg>
+    Kite <span class="brand-sub">docs</span>
+  </a>
+  <nav>
+    <a href="https://demo.dashboardpack.com/kite/">Live demo</a>
+    <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard">GitHub</a>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside><h4>Start</h4>
+    <a href="index.html">Overview</a>
+    <a href="getting-started.html">Getting started</a>
+    <a href="structure.html">Project structure</a>
+    <a href="screens.html">Screens</a>
+    <h4>Build on it</h4>
+    <a href="data.html" class="here">Data layer</a>
+    <a href="resources.html">Adding a resource</a>
+    <a href="routing.html">Routing</a>
+    <a href="state.html">State</a>
+    <a href="theming.html">Theming</a>
+    <a href="components.html">Components</a>
+    <a href="i18n.html">Localisation</a>
+    <h4>Ship it</h4>
+    <a href="platforms.html">Platforms</a>
+    <a href="deploy.html">Deploying</a>
+    <a href="faq.html">FAQ</a></aside>
+  <main>
+<h1>Data layer</h1>
+<p class="lead">One interface, three adapters. Screens never talk to HTTP.</p>
+
+<h2>The contract</h2>
+<pre><code>typedef JsonMap = Map&lt;String, Object?&gt;;
+
+abstract interface class DataProvider {
+  Future&lt;ListResult&gt; getList(String resource, ListParams params);
+  Future&lt;JsonMap&gt;   getOne (String resource, String id);
+  Future&lt;JsonMap&gt;   create (String resource, JsonMap data);
+  Future&lt;JsonMap&gt;   update (String resource, String id, JsonMap data);
+  Future&lt;void&gt;      delete (String resource, String id);
+}</code></pre>
+<p>
+  Deliberately untyped at the boundary. The template cannot know your models,
+  and forcing a codegen step on someone evaluating a template is how you lose
+  them in the first ten minutes. Decode into your own types above this line.
+</p>
+
+<h2>ListParams and ListResult</h2>
+<pre><code>const ListParams({
+  int page = 1,
+  int perPage = 25,
+  SortSpec? sort,
+  String search = '',
+  Map&lt;String, Object?&gt; filters = const {},
+});
+
+class ListResult {
+  final List&lt;JsonMap&gt; rows;   // this page
+  final int total;            // across ALL pages
+}</code></pre>
+<div class="note warn">
+  <p>
+    <b><code>total</code> is the count across every page, not the length of the
+    page you were handed.</b> Getting this wrong still renders a table — it just
+    paginates wrongly, which is the kind of bug nobody notices until a customer
+    reports missing records.
+  </p>
+</div>
+
+<h2>Switching backend</h2>
+<p>
+  One line, in <code>lib/core/data/mock_data_provider.dart</code>. Every screen
+  follows, including the ⌘K command palette.
+</p>
+<pre><code>// The default — no backend needed
+final dataProvider = Provider&lt;DataProvider&gt;((ref) =&gt; MockDataProvider());
+
+// A conventional REST API
+final dataProvider = Provider&lt;DataProvider&gt;(
+  (ref) =&gt; RestDataProvider(
+    baseUrl: 'https://api.example.com',
+    headers: {'Authorization': 'Bearer $token'},
+  ),
+);
+
+// Supabase
+final dataProvider = Provider&lt;DataProvider&gt;(
+  (ref) =&gt; SupabaseDataProvider(
+    url: 'https://xyzcompany.supabase.co',
+    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+  ),
+);</code></pre>
+
+<h2>MockDataProvider</h2>
+<p>
+  The most important adapter, because it is what someone sees in the first sixty
+  seconds. It does <em>real</em> work — search, filter, sort and paginate all
+  execute against in-memory tables and return a page plus a total — so your
+  screens exercise the same code paths a real backend will.
+</p>
+<p>
+  Seeded deterministically: 1,284 orders, 642 customers, 312 products. Latency
+  is simulated at 180ms and configurable, so loading states are visible during
+  development instead of flashing past.
+</p>
+<pre><code>MockDataProvider(latency: Duration.zero)   // for tests</code></pre>
+
+<h2>RestDataProvider</h2>
+<p>Assumes the shape most JSON APIs already use:</p>
+<pre><code>GET    /orders?_page=1&amp;_limit=25&amp;_sort=total&amp;_order=desc&amp;q=ada&amp;status=Paid
+GET    /orders/10004
+POST   /orders
+PATCH  /orders/10004
+DELETE /orders/10004</code></pre>
+<p>
+  The row count comes from an <code>X-Total-Count</code> header, falling back to
+  a <code>total</code> field on an envelope. Bodies may be a bare array or
+  <code>{ "data": [...], "total": n }</code> — both are unwrapped.
+</p>
+<p>
+  If your API spells any of that differently, <code>rest_data_provider.dart</code>
+  is the one file to change. It is about 120 lines.
+</p>
+
+<h2>SupabaseDataProvider</h2>
+<p>
+  Talks to PostgREST directly over <code>http</code> — deliberately <em>not</em>
+  <code>supabase_flutter</code>. Pulling a large SDK plus its auth, realtime and
+  storage into a template most people will re-point at their own backend is a
+  poor trade. If you want the SDK, this class is the seam to replace.
+</p>
+<pre><code>// Count comes from Content-Range, requested with Prefer: count=exact
+Range: 25-49
+Content-Range: 25-49/1284</code></pre>
+<p>
+  Search needs columns named explicitly — PostgREST has no "search everything".
+  Edit <code>SupabaseDataProvider.searchColumns</code> for your tables.
+</p>
+
+<h2>Errors</h2>
+<p>
+  Every adapter throws <code>DataProviderException</code> with a readable
+  message. Screens render it through <code>ErrorState</code>, which offers a
+  retry — a spinner that never resolves is worse than an error.
+</p>
+<pre><code>async.when(
+  loading: () =&gt; const LoadingState(),
+  error: (e, _) =&gt; ErrorState(
+    message: e is DataProviderException ? e.message : '$e',
+    onRetry: () =&gt; ref.invalidate(listProvider(resource)),
+  ),
+  data: (result) =&gt; …,
+)</code></pre>
+
+<h2>Writing your own</h2>
+<p>
+  Implement the five methods. The tests in
+  <code>test/rest_provider_test.dart</code> show the shape — a fake
+  <code>http.Client</code>, then assertions on query construction, total
+  parsing, and a 404 becoming an exception rather than a crash. Copy that file
+  and point it at yours.
+</p>
+    <nav class="pager"><a class="prev" href="screens.html"><span>Previous</span>Screens</a><a class="next" href="resources.html"><span>Next</span>Adding a resource</a></nav>
+  </main>
+</div>
+
+<footer>
+  MIT &copy; <a href="https://colorlib.com">Colorlib</a> &mdash; the team behind
+  <a href="https://github.com/ColorlibHQ/AdminLTE">AdminLTE</a>.
+</footer>
+
+</body>
+</html>
