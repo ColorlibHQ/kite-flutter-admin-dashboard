@@ -59,7 +59,7 @@
 <p class="lead">Build, shrink, ship.</p>
 
 <h2>Build</h2>
-<pre><code>flutter build web --wasm --release --base-href /kite/
+<pre><code>flutter build web --wasm --release --base-href /kite/ --dart-define=KITE_DEMO=true
 node tools/strip-fonts.mjs build/web
 python3 tools/subset-lucide.py build/web</code></pre>
 <p>

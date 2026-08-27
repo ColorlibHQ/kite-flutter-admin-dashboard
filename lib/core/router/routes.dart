@@ -37,12 +37,20 @@ abstract final class R {
 
 @immutable
 class NavItem {
-  const NavItem(this.label, this.path, this.icon);
+  const NavItem(this.label, this.path, this.icon, {this.inSidebar = true});
 
   /// English label. Also the fallback if a translation is missing.
   final String label;
   final String path;
   final IconData icon;
+
+  /// Whether the sidebar lists this item.
+  ///
+  /// Profile is reachable from the account menu, where people look for it, and
+  /// listing it again under "Build" both mis-grouped it and pushed the last
+  /// real nav row under the promo card. It stays here so the command palette
+  /// and the page-title lookup still resolve it.
+  final bool inSidebar;
 
   /// Localised label. Kept as a lookup rather than a stored string so the
   /// sidebar re-reads it when the locale changes.
@@ -106,7 +114,7 @@ const kNavGroups = <NavGroup>[
     NavItem('Forms', R.forms, Icons.edit_note_outlined),
     NavItem('Wizard', R.wizard, Icons.linear_scale_outlined),
     NavItem('Settings', R.settings, Icons.settings_outlined),
-    NavItem('Profile', R.profile, Icons.person_outline),
+    NavItem('Profile', R.profile, Icons.person_outline, inSidebar: false),
   ]),
 ];
 

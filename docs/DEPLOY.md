@@ -22,12 +22,17 @@ linkable. R2 serves `index.html` for unknown paths under a prefix, which is
 what makes `/kite/orders/10004` resolve on a refresh.
 
 ```bash
-flutter build web --wasm --release --base-href /kite/
+flutter build web --wasm --release --base-href /kite/ --dart-define=KITE_DEMO=true
 node tools/strip-fonts.mjs build/web
 python3 tools/subset-lucide.py build/web
 ```
 
 `--base-href` must match the R2 prefix or every asset 404s.
+
+`KITE_DEMO=true` starts the hosted demo already signed in. Without it the
+first thing a visitor from a link sees is a login form, which is a wall in
+front of the thing they came to look at. Leave it off for any build people
+clone and run — they should get the real auth flow.
 
 ## Demo
 

@@ -27,9 +27,19 @@ class SessionUser {
 /// project before anything renders loses the reader in the first minute. Swap
 /// [signIn] for a real call and the guard, redirects and every screen keep
 /// working unchanged.
+/// Starts the app already signed in.
+///
+/// Only the hosted demo sets this. A visitor arriving from a link wants to see
+/// the dashboard, not a login wall — but anyone who clones the repo should get
+/// the real signed-out flow, so the default stays `false`.
+///   flutter build web --dart-define=KITE_DEMO=true
+const kDemoAutoSignIn = bool.fromEnvironment('KITE_DEMO');
+
 class SessionController extends Notifier<SessionUser?> {
   @override
-  SessionUser? build() => null;
+  SessionUser? build() => kDemoAutoSignIn
+      ? const SessionUser(name: 'Ada Lovelace', email: 'ada@kite.dev')
+      : null;
 
   bool get isSignedIn => state != null;
 

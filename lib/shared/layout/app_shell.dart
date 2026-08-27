@@ -112,9 +112,12 @@ class _SidebarBody extends StatelessWidget {
             children: [
               for (final group in kNavGroups) ...[
                 Padding(
+                  // Tight on purpose: four group labels at `lg` pushed the last
+                  // nav item under the pinned promo card at 1000px viewport
+                  // height, where it read as clipped rather than scrollable.
                   padding: const EdgeInsets.fromLTRB(
                     KiteSpace.md,
-                    KiteSpace.lg,
+                    KiteSpace.sm,
                     KiteSpace.md,
                     KiteSpace.xs,
                   ),
@@ -128,7 +131,8 @@ class _SidebarBody extends StatelessWidget {
                   ),
                 ),
                 for (final item in group.items)
-                  _NavTile(item: item, active: location == item.path),
+                  if (item.inSidebar)
+                    _NavTile(item: item, active: location == item.path),
               ],
             ],
           ),
