@@ -313,19 +313,22 @@ class _ComponentsScreenState extends State<ComponentsScreen> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: wide
-            ? _Masonry(children: sections)
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final s in sections) ...[
-                    s,
-                    const SizedBox(height: KiteSpace.xl),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: wide
+              ? _Masonry(children: sections)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final s in sections) ...[
+                      s,
+                      const SizedBox(height: KiteSpace.xl),
+                    ],
                   ],
-                ],
-              ),
+                ),
+        ),
       ),
     );
   }

@@ -102,111 +102,114 @@ class _FormsScreenState extends State<FormsScreen> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 680),
-        child: KiteCard(
-          title: 'New product',
-          trailing: _saved
-              ? const KiteBadge('Saved', tone: KiteTone.success)
-              : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              KiteField(
-                label: 'Product name',
-                error: _errors['name'],
-                child: KiteInput(
-                  controller: _name,
-                  placeholder: 'Standing desk',
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: KiteCard(
+            title: 'New product',
+            trailing: _saved
+                ? const KiteBadge('Saved', tone: KiteTone.success)
+                : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                KiteField(
+                  label: 'Product name',
+                  error: _errors['name'],
+                  child: KiteInput(
+                    controller: _name,
+                    placeholder: 'Standing desk',
+                  ),
                 ),
-              ),
-              KiteField(
-                label: 'Contact email',
-                hint: 'Used for stock alerts only.',
-                error: _errors['email'],
-                child: KiteInput(
-                  controller: _email,
-                  placeholder: 'you@company.com',
-                  keyboardType: TextInputType.emailAddress,
+                KiteField(
+                  label: 'Contact email',
+                  hint: 'Used for stock alerts only.',
+                  error: _errors['email'],
+                  child: KiteInput(
+                    controller: _email,
+                    placeholder: 'you@company.com',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                 ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: KiteField(
-                      label: 'Category',
-                      error: _errors['category'],
-                      child: KiteSelect<String>(
-                        options: _categories,
-                        labelOf: (v) => v,
-                        value: _category,
-                        placeholder: 'Choose one',
-                        onChanged: (v) => setState(() => _category = v),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: KiteField(
+                        label: 'Category',
+                        error: _errors['category'],
+                        child: KiteSelect<String>(
+                          options: _categories,
+                          labelOf: (v) => v,
+                          value: _category,
+                          placeholder: 'Choose one',
+                          onChanged: (v) => setState(() => _category = v),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: KiteSpace.lg),
-                  Expanded(
-                    child: KiteField(
-                      label: 'Ship date',
-                      error: _errors['ship'],
-                      child: KiteDatePicker(
-                        selected: _shipDate,
-                        onChanged: (v) => setState(() => _shipDate = v),
+                    const SizedBox(width: KiteSpace.lg),
+                    Expanded(
+                      child: KiteField(
+                        label: 'Ship date',
+                        error: _errors['ship'],
+                        child: KiteDatePicker(
+                          selected: _shipDate,
+                          onChanged: (v) => setState(() => _shipDate = v),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              KiteField(
-                label: 'Notes',
-                hint: 'Anything the warehouse should know.',
-                child: KiteTextarea(
-                  controller: _notes,
-                  placeholder: 'Fragile — do not stack pallets.',
+                  ],
                 ),
-              ),
-              Text(
-                'Launch discount — ${_discount.round()}%',
-                style: t.small.copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: KiteSpace.sm),
-              KiteSlider(
-                value: _discount,
-                onChanged: (v) => setState(() => _discount = v),
-              ),
-              const SizedBox(height: KiteSpace.xl),
-              const KiteSeparator(),
-              const SizedBox(height: KiteSpace.xl),
-              KiteSwitch(
-                value: _notify,
-                label: 'Email me when stock runs low',
-                sublabel: 'At most one message a day.',
-                onChanged: (v) => setState(() => _notify = v),
-              ),
-              const SizedBox(height: KiteSpace.lg),
-              KiteCheckbox(
-                value: _backorder,
-                label: 'Allow backorders',
-                sublabel: 'Customers can order past zero stock.',
-                onChanged: (v) => setState(() => _backorder = v),
-              ),
-              const SizedBox(height: KiteSpace.xl),
-              Row(
-                children: [
-                  KiteButton(
-                    onPressed: _submit,
-                    child: const Text('Create product'),
+                KiteField(
+                  label: 'Notes',
+                  hint: 'Anything the warehouse should know.',
+                  child: KiteTextarea(
+                    controller: _notes,
+                    placeholder: 'Fragile — do not stack pallets.',
                   ),
-                  const SizedBox(width: KiteSpace.md),
-                  KiteButton.ghost(
-                    onPressed: _reset,
-                    child: const Text('Reset'),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                Text(
+                  'Launch discount — ${_discount.round()}%',
+                  style: t.small.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: KiteSpace.sm),
+                KiteSlider(
+                  value: _discount,
+                  onChanged: (v) => setState(() => _discount = v),
+                ),
+                const SizedBox(height: KiteSpace.xl),
+                const KiteSeparator(),
+                const SizedBox(height: KiteSpace.xl),
+                KiteSwitch(
+                  value: _notify,
+                  label: 'Email me when stock runs low',
+                  sublabel: 'At most one message a day.',
+                  onChanged: (v) => setState(() => _notify = v),
+                ),
+                const SizedBox(height: KiteSpace.lg),
+                KiteCheckbox(
+                  value: _backorder,
+                  label: 'Allow backorders',
+                  sublabel: 'Customers can order past zero stock.',
+                  onChanged: (v) => setState(() => _backorder = v),
+                ),
+                const SizedBox(height: KiteSpace.xl),
+                Row(
+                  children: [
+                    KiteButton(
+                      onPressed: _submit,
+                      child: const Text('Create product'),
+                    ),
+                    const SizedBox(width: KiteSpace.md),
+                    KiteButton.ghost(
+                      onPressed: _reset,
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

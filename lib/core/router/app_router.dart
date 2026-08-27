@@ -10,6 +10,8 @@ import '../../features/auth/auth_screens.dart';
 import '../../features/components/components_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/forms/forms_screen.dart';
+import '../../features/resources/resource_detail_screen.dart';
+import '../../features/resources/resource_form_screen.dart';
 import '../../features/resources/resource_list_screen.dart';
 import '../../features/system/error_screen.dart';
 import '../../features/system/settings_screen.dart';
@@ -58,18 +60,35 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: R.dashboard,
             builder: (_, _) => const DashboardScreen(),
           ),
-          GoRoute(
-            path: R.orders,
-            builder: (_, _) => const ResourceListScreen(resource: 'orders'),
-          ),
-          GoRoute(
-            path: R.customers,
-            builder: (_, _) => const ResourceListScreen(resource: 'customers'),
-          ),
-          GoRoute(
-            path: R.products,
-            builder: (_, _) => const ResourceListScreen(resource: 'products'),
-          ),
+          // One list / new / detail / edit set per resource. `new` is declared
+          // before `:id` so it is matched as a literal rather than an id.
+          for (final resource in const ['orders', 'customers', 'products'])
+            GoRoute(
+              path: '/$resource',
+              builder: (_, _) => ResourceListScreen(resource: resource),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (_, _) => ResourceFormScreen(resource: resource),
+                ),
+                GoRoute(
+                  path: ':id',
+                  builder: (_, state) => ResourceDetailScreen(
+                    resource: resource,
+                    id: state.pathParameters['id']!,
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      builder: (_, state) => ResourceFormScreen(
+                        resource: resource,
+                        id: state.pathParameters['id']!,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           GoRoute(path: R.inbox, builder: (_, _) => const InboxScreen()),
           GoRoute(path: R.kanban, builder: (_, _) => const KanbanScreen()),
           GoRoute(path: R.calendar, builder: (_, _) => const CalendarScreen()),

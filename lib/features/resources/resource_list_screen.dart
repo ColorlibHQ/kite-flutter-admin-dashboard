@@ -1,80 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/data/data_provider.dart';
-import '../../core/data/mock_data_provider.dart';
 import '../../kite_ui/kite_ui.dart';
 import '../../shared/widgets/states.dart';
-
-/// How a column renders. `money` matters: currency has to keep its numeric
-/// value so sorting stays correct while the cell still shows `$1,294.00`.
-enum ColKind { text, number, money }
-
-/// Column definitions per resource. A real app would derive these from its own
-/// models; keeping them declarative here is what lets one screen serve orders,
-/// customers and products without three copies of it.
-const _schemas = <String, List<(String field, String title, ColKind kind)>>{
-  'orders': [
-    ('reference', 'Order', ColKind.text),
-    ('customer', 'Customer', ColKind.text),
-    ('status', 'Status', ColKind.text),
-    ('items', 'Items', ColKind.number),
-    ('total', 'Total', ColKind.money),
-    ('date', 'Date', ColKind.text),
-  ],
-  'customers': [
-    ('name', 'Name', ColKind.text),
-    ('email', 'Email', ColKind.text),
-    ('orders', 'Orders', ColKind.number),
-    ('spend', 'Lifetime spend', ColKind.money),
-    ('status', 'Status', ColKind.text),
-  ],
-  'products': [
-    ('name', 'Product', ColKind.text),
-    ('sku', 'SKU', ColKind.text),
-    ('price', 'Price', ColKind.money),
-    ('stock', 'Stock', ColKind.number),
-    ('status', 'Status', ColKind.text),
-  ],
-};
-
-const _statusFilters = <String, List<String>>{
-  'orders': ['Paid', 'Pending', 'Refunded', 'Shipped', 'Cancelled'],
-  'customers': ['Active', 'Churned'],
-  'products': ['In stock', 'Low', 'Out of stock'],
-};
-
-/// Query state, keyed by resource.
-///
-/// One notifier holding a map rather than a provider family — fewer moving
-/// parts to explain, and a template is read more than it is extended.
-class ListParamsController extends Notifier<Map<String, ListParams>> {
-  @override
-  Map<String, ListParams> build() => const {};
-
-  static const _initial = ListParams(perPage: 25);
-
-  ListParams of(String resource) => state[resource] ?? _initial;
-
-  void update(String resource, ListParams params) =>
-      state = {...state, resource: params};
-
-  void reset(String resource) => update(resource, _initial);
-}
-
-final listParamsProvider =
-    NotifierProvider<ListParamsController, Map<String, ListParams>>(
-      ListParamsController.new,
-    );
-
-final _listProvider = FutureProvider.family<ListResult, String>((
-  Ref ref,
-  String resource,
-) async {
-  final params =
-      ref.watch(listParamsProvider)[resource] ?? ListParamsController._initial;
-  return ref.watch(dataProvider).getList(resource, params);
-});
+import 'resource_providers.dart';
+import 'resource_schema.dart';
 
 class ResourceListScreen extends ConsumerWidget {
   const ResourceListScreen({super.key, required this.resource});
@@ -83,23 +15,23 @@ class ResourceListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(_listProvider(resource));
+    final spec = kResources[resource]!;
+    final async = ref.watch(listProvider(resource));
     final params = ref.watch(listParamsProvider.notifier).of(resource);
-    final schema = _schemas[resource]!;
 
     return Padding(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Toolbar(resource: resource),
+          _Toolbar(resource: resource, spec: spec),
           const SizedBox(height: KiteSpace.lg),
           Expanded(
             child: async.when(
               loading: () => const LoadingState(),
               error: (e, _) => ErrorState(
                 message: e is DataProviderException ? e.message : '$e',
-                onRetry: () => ref.invalidate(_listProvider(resource)),
+                onRetry: () => ref.invalidate(listProvider(resource)),
               ),
               data: (result) {
                 if (result.rows.isEmpty) {
@@ -116,29 +48,26 @@ class ResourceListScreen extends ConsumerWidget {
                     Expanded(
                       child: KiteDataTable(
                         paginate: false,
-                        onRowTap: (i) => _openDetail(
-                          context,
-                          ref,
-                          resource: resource,
-                          schema: schema,
-                          row: result.rows[i],
-                        ),
+                        onRowTap: (i) =>
+                            context.go('/$resource/${result.rows[i]['id']}'),
                         columns: [
-                          for (final (field, title, kind) in schema)
+                          for (final f in spec.listFields)
                             TrinaColumn(
-                              title: title,
-                              field: field,
+                              title: f.title,
+                              field: f.field,
                               readOnly: true,
-                              textAlign: kind == ColKind.text
-                                  ? TrinaColumnTextAlign.start
-                                  : TrinaColumnTextAlign.end,
-                              type: switch (kind) {
-                                ColKind.text => TrinaColumnType.text(),
+                              textAlign:
+                                  f.kind == ColKind.number ||
+                                      f.kind == ColKind.money
+                                  ? TrinaColumnTextAlign.end
+                                  : TrinaColumnTextAlign.start,
+                              type: switch (f.kind) {
                                 ColKind.number => TrinaColumnType.number(),
                                 ColKind.money => TrinaColumnType.currency(
                                   symbol: r'$',
                                   decimalDigits: 2,
                                 ),
+                                _ => TrinaColumnType.text(),
                               },
                             ),
                         ],
@@ -146,8 +75,8 @@ class ResourceListScreen extends ConsumerWidget {
                           for (final row in result.rows)
                             TrinaRow(
                               cells: {
-                                for (final (field, _, _) in schema)
-                                  field: TrinaCell(value: row[field] ?? ''),
+                                for (final f in spec.listFields)
+                                  f.field: TrinaCell(value: row[f.field] ?? ''),
                               },
                             ),
                         ],
@@ -170,98 +99,10 @@ class ResourceListScreen extends ConsumerWidget {
   }
 }
 
-/// Row detail drawer.
-///
-/// Double-tap a row to inspect it without losing your place in the table, then
-/// act on it from there. Deleting asks first and says so afterwards — a control
-/// that says what it will do, then a message confirming it did.
-void _openDetail(
-  BuildContext context,
-  WidgetRef ref, {
-  required String resource,
-  required List<(String, String, ColKind)> schema,
-  required JsonMap row,
-}) {
-  final label = '${row[schema.first.$1]}';
-  kiteSheet<void>(
-    context,
-    title: label,
-    description: 'Double-tapped from the $resource table.',
-    body: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final (field, title, kind) in schema)
-          _DetailRow(
-            label: title,
-            value: switch (kind) {
-              ColKind.money => KiteFormat.money(row[field]),
-              ColKind.number => KiteFormat.count(row[field]),
-              ColKind.text => '${row[field]}',
-            },
-          ),
-      ],
-    ),
-    actions: [
-      KiteButton.outline(
-        onPressed: () {
-          Navigator.of(context).pop();
-          KiteToast.show(
-            context,
-            title: 'Nothing to edit yet',
-            description: 'Create and edit screens land in the next phase.',
-          );
-        },
-        child: const Text('Edit'),
-      ),
-      KiteButton.destructive(
-        onPressed: () async {
-          final ok = await kiteConfirm(
-            context,
-            title: 'Delete $label?',
-            message:
-                'This removes the record permanently and cannot be undone.',
-          );
-          if (!ok || !context.mounted) return;
-          await ref.read(dataProvider).delete(resource, '${row['id']}');
-          if (!context.mounted) return;
-          Navigator.of(context).pop();
-          ref.invalidate(_listProvider(resource));
-          KiteToast.show(
-            context,
-            title: '$label deleted',
-            tone: KiteTone.danger,
-          );
-        },
-        child: const Text('Delete'),
-      ),
-    ],
-  );
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value});
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = KiteText.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: KiteSpace.sm),
-      child: Row(
-        children: [
-          SizedBox(width: 120, child: Text(label, style: t.muted)),
-          Expanded(child: Text(value, style: t.p.copyWith(fontSize: 14))),
-        ],
-      ),
-    );
-  }
-}
-
 class _Toolbar extends ConsumerWidget {
-  const _Toolbar({required this.resource});
+  const _Toolbar({required this.resource, required this.spec});
   final String resource;
+  final ResourceSpec spec;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -270,7 +111,6 @@ class _Toolbar extends ConsumerWidget {
     ref.watch(listParamsProvider);
     final notifier = ref.read(listParamsProvider.notifier);
     final params = notifier.of(resource);
-    final statuses = _statusFilters[resource]!;
     final active = params.filters['status'] as String?;
 
     return Wrap(
@@ -279,35 +119,15 @@ class _Toolbar extends ConsumerWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         SizedBox(
-          width: 260,
-          child: TextField(
-            style: t.p.copyWith(fontSize: 14),
+          width: 240,
+          child: KiteInput(
+            placeholder: 'Search $resource…',
+            leading: Icon(Icons.search, size: 16, color: c.mutedForeground),
             onChanged: (v) =>
                 notifier.update(resource, params.copyWith(search: v, page: 1)),
-            decoration: InputDecoration(
-              hintText: 'Search $resource…',
-              hintStyle: t.muted.copyWith(fontSize: 14),
-              prefixIcon: Icon(
-                Icons.search,
-                size: 18,
-                color: c.mutedForeground,
-              ),
-              isDense: true,
-              filled: true,
-              fillColor: c.card,
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: KiteRadius.allSm,
-                borderSide: BorderSide(color: c.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: KiteRadius.allSm,
-                borderSide: BorderSide(color: c.ring, width: 1.5),
-              ),
-            ),
           ),
         ),
-        for (final s in statuses)
+        for (final s in spec.statuses)
           _FilterChip(
             label: s,
             selected: active == s,
@@ -324,25 +144,25 @@ class _Toolbar extends ConsumerWidget {
         KiteButton.ghost(
           leading: const Icon(Icons.refresh, size: 16),
           onPressed: () {
-            ref.invalidate(_listProvider(resource));
+            ref.invalidate(listProvider(resource));
             KiteToast.show(context, title: 'Refreshed');
           },
           child: const Text('Refresh'),
         ),
-        KiteButton.outline(
-          leading: const Icon(Icons.download, size: 16),
-          onPressed: () => KiteToast.show(
-            context,
-            title: 'Export queued',
-            description: 'You will get an email when the CSV is ready.',
-            tone: KiteTone.success,
-          ),
-          child: const Text('Export'),
+        KiteButton(
+          leading: const Icon(Icons.add, size: 16),
+          onPressed: () => context.go('/$resource/new'),
+          child: Text('New ${spec.singular.toLowerCase()}'),
         ),
         KiteTooltip(
-          message: 'Double-tap any row to open its details',
+          message: 'Double-tap any row to open it',
           child: Icon(Icons.help_outline, size: 16, color: c.mutedForeground),
         ),
+        if (params.search.isNotEmpty || active != null)
+          KiteButton.ghost(
+            onPressed: () => notifier.reset(resource),
+            child: Text('Clear', style: t.small),
+          ),
       ],
     );
   }
@@ -420,12 +240,10 @@ class _Pager extends ConsumerWidget {
               notifier.update(resource, params.copyWith(page: params.page - 1)),
           child: const Text('Previous'),
         ),
-        const SizedBox(width: KiteSpace.sm),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: KiteSpace.md),
           child: Text('Page ${params.page} of $pages', style: t.small),
         ),
-        const SizedBox(width: KiteSpace.sm),
         KiteButton.outline(
           enabled: params.page < pages,
           onPressed: () =>

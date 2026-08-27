@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
 
   # Design language. Confined to lib/kite_ui/ — see docs/ARCHITECTURE.md.
   # Capped at 0.55.x by trina_grid, which depends on shadcn_ui ^0.55.0.

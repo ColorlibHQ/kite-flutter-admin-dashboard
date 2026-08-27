@@ -222,9 +222,15 @@ class _TopBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = KiteColors.of(context);
     final t = KiteText.of(context);
-    final title =
-        kNav.where((n) => n.path == location).map((n) => n.label).firstOrNull ??
-        'Kite';
+    // Longest-prefix match, not equality: /orders/10004/edit still belongs to
+    // Orders. Exact matching left every nested route titled "Kite".
+    final matches = [
+      for (final n in kNav)
+        if (location == n.path ||
+            (n.path != '/' && location.startsWith('${n.path}/')))
+          n,
+    ]..sort((a, b) => b.path.length.compareTo(a.path.length));
+    final title = matches.isEmpty ? 'Kite' : matches.first.label;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(

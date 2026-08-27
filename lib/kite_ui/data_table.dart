@@ -29,6 +29,8 @@ class KiteDataTable extends StatelessWidget {
     required this.rows,
     this.onLoaded,
     this.onRowTap,
+    this.rowActionIcon = Icons.arrow_forward,
+    this.rowActionTooltip = 'Open',
     this.pageSize = 25,
     this.paginate = true,
   });
@@ -37,9 +39,14 @@ class KiteDataTable extends StatelessWidget {
   final List<TrinaRow<dynamic>> rows;
   final void Function(TrinaGridStateManager)? onLoaded;
 
-  /// Fired with the tapped row's index. Opening a detail drawer from a row is
-  /// the single most-used interaction in an admin table.
+  /// Opens the row. Rendered as an explicit trailing action column, because
+  /// double-tap is undiscoverable and, on desktop, trina_grid detects it with
+  /// a manual timing window that is easy to miss. Double-tap still works as a
+  /// shortcut for anyone who tries it.
   final void Function(int rowIdx)? onRowTap;
+
+  final IconData rowActionIcon;
+  final String rowActionTooltip;
   final int pageSize;
   final bool paginate;
 
@@ -56,8 +63,45 @@ class KiteDataTable extends StatelessWidget {
           borderRadius: KiteRadius.allMd,
         ),
         child: TrinaGrid(
-          columns: columns,
-          rows: rows,
+          columns: [
+            ...columns,
+            if (onRowTap != null)
+              TrinaColumn(
+                title: '',
+                field: '_actions',
+                width: 64,
+                minWidth: 64,
+                readOnly: true,
+                enableSorting: false,
+                enableColumnDrag: false,
+                enableContextMenu: false,
+                enableDropToResize: false,
+                textAlign: TrinaColumnTextAlign.center,
+                type: TrinaColumnType.text(),
+                renderer: (ctx) => Center(
+                  child: IconButton(
+                    icon: Icon(rowActionIcon, size: 16),
+                    tooltip: rowActionTooltip,
+                    color: c.mutedForeground,
+                    splashRadius: 16,
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => onRowTap!(ctx.rowIdx),
+                  ),
+                ),
+              ),
+          ],
+          rows: [
+            for (final row in rows)
+              if (onRowTap == null)
+                row
+              else
+                TrinaRow(
+                  cells: {
+                    ...row.cells,
+                    '_actions': TrinaCell(value: ''),
+                  },
+                ),
+          ],
           onLoaded: (TrinaGridOnLoadedEvent e) {
             if (paginate) e.stateManager.setPageSize(pageSize, notify: false);
             onLoaded?.call(e.stateManager);
