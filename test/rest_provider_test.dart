@@ -9,35 +9,38 @@ import 'package:kite/core/data/supabase_data_provider.dart';
 
 void main() {
   group('RestDataProvider', () {
-    test('sends paging, sort, search and filters as query parameters', () async {
-      late Uri seen;
-      final provider = RestDataProvider(
-        baseUrl: 'https://api.example.com',
-        client: MockClient((req) async {
-          seen = req.url;
-          return http.Response('[]', 200, headers: {'x-total-count': '0'});
-        }),
-      );
+    test(
+      'sends paging, sort, search and filters as query parameters',
+      () async {
+        late Uri seen;
+        final provider = RestDataProvider(
+          baseUrl: 'https://api.example.com',
+          client: MockClient((req) async {
+            seen = req.url;
+            return http.Response('[]', 200, headers: {'x-total-count': '0'});
+          }),
+        );
 
-      await provider.getList(
-        'orders',
-        const ListParams(
-          page: 3,
-          perPage: 25,
-          search: 'ada',
-          sort: SortSpec('total', SortDir.desc),
-          filters: {'status': 'Paid'},
-        ),
-      );
+        await provider.getList(
+          'orders',
+          const ListParams(
+            page: 3,
+            perPage: 25,
+            search: 'ada',
+            sort: SortSpec('total', SortDir.desc),
+            filters: {'status': 'Paid'},
+          ),
+        );
 
-      expect(seen.path, '/orders');
-      expect(seen.queryParameters['_page'], '3');
-      expect(seen.queryParameters['_limit'], '25');
-      expect(seen.queryParameters['q'], 'ada');
-      expect(seen.queryParameters['_sort'], 'total');
-      expect(seen.queryParameters['_order'], 'desc');
-      expect(seen.queryParameters['status'], 'Paid');
-    });
+        expect(seen.path, '/orders');
+        expect(seen.queryParameters['_page'], '3');
+        expect(seen.queryParameters['_limit'], '25');
+        expect(seen.queryParameters['q'], 'ada');
+        expect(seen.queryParameters['_sort'], 'total');
+        expect(seen.queryParameters['_order'], 'desc');
+        expect(seen.queryParameters['status'], 'Paid');
+      },
+    );
 
     test('reads the total from X-Total-Count, not the page length', () async {
       final provider = RestDataProvider(
@@ -128,7 +131,10 @@ void main() {
         }),
       );
       await provider.getList('customers', const ListParams(search: 'ada'));
-      expect(seen.queryParameters['or'], '(name.ilike.*ada*,email.ilike.*ada*)');
+      expect(
+        seen.queryParameters['or'],
+        '(name.ilike.*ada*,email.ilike.*ada*)',
+      );
     });
 
     test('getOne throws when the row set comes back empty', () async {
