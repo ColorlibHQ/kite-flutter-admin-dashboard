@@ -11,12 +11,9 @@ on:
 env:
   FLUTTER_VERSION: '3.47.1'
   # App payload only — skwasm.wasm (~1.2 MB) comes from gstatic and is shared
-  # across every Flutter web app, so it is excluded. Measured 2026-08-26 on the
-  # Phase 1 shell: 1796 KB, of which ~515 KB is fonts (Lucide base 343 KB +
-  # Geist/GeistMono 172 KB). Budget is measured + ~10% headroom.
-  # Next lever if this gets tight: subset the base Lucide face to the glyphs
-  # shadcn actually draws. Do NOT drop it outright — see docs/SPIKE-B-C.md.
-  WASM_GZIP_BUDGET_KB: 1975
+  # across every Flutter web app, so it is excluded. Measured 2026-08-27 with
+  # both font tools applied: 1562 KB. Budget is measured + ~12% headroom.
+  WASM_GZIP_BUDGET_KB: 1750
 
 jobs:
   analyze:
@@ -102,6 +99,10 @@ jobs:
       - run: flutter pub get
       - run: flutter build web --wasm --release
       - run: node tools/strip-fonts.mjs build/web
+      - name: Subset the Lucide face
+        run: |
+          pip install --quiet fonttools
+          python3 tools/subset-lucide.py build/web
       - name: Measure gzipped app payload
         # NOTE: build/web ships SIX mutually-exclusive renderer variants plus .symbols
         # debug files. Summing the directory reports ~13 MB against a real 2.4 MB.
@@ -138,6 +139,10 @@ jobs:
       - run: flutter build web --wasm --release
       - name: Drop Lucide variable-weight instances
         run: node tools/strip-fonts.mjs build/web
+      - name: Subset the Lucide face to the glyphs actually drawn
+        run: |
+          pip install --quiet fonttools
+          python3 tools/subset-lucide.py build/web
       - name: Exactly one Lucide family must survive
         # >1 means the strip step regressed and ~1.15 MB of unused weights ship.
         #  0 means the BASE family was dropped too, which leaves tofu boxes where

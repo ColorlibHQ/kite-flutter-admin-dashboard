@@ -9,11 +9,13 @@ import '../../features/apps/kanban_screen.dart';
 import '../../features/auth/auth_screens.dart';
 import '../../features/components/components_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
+import '../../features/dashboard/project_dashboard_screen.dart';
 import '../../features/forms/forms_screen.dart';
 import '../../features/resources/resource_detail_screen.dart';
 import '../../features/resources/resource_form_screen.dart';
 import '../../features/resources/resource_list_screen.dart';
 import '../../features/system/error_screen.dart';
+import '../../features/system/profile_screen.dart';
 import '../../features/system/settings_screen.dart';
 import '../../shared/layout/app_shell.dart';
 import '../auth/session.dart';
@@ -98,7 +100,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const ComponentsScreen(),
           ),
           GoRoute(path: R.forms, builder: (_, _) => const FormsScreen()),
+          GoRoute(
+            path: R.projects,
+            builder: (_, _) => const ProjectDashboardScreen(),
+          ),
           GoRoute(path: R.settings, builder: (_, _) => const SettingsScreen()),
+          GoRoute(path: R.profile, builder: (_, _) => const ProfileScreen()),
+          GoRoute(
+            path: R.serverError,
+            builder: (_, _) => const ServerErrorScreen(),
+          ),
         ],
       ),
     ],

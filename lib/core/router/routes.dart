@@ -10,6 +10,8 @@ abstract final class R {
   static const lock = '/lock';
 
   static const dashboard = '/';
+  static const projects = '/projects';
+  static const serverError = '/500';
   static const orders = '/orders';
   static const customers = '/customers';
   static const products = '/products';
@@ -53,6 +55,7 @@ class NavGroup {
 const kNavGroups = <NavGroup>[
   NavGroup('Overview', [
     NavItem('Dashboard', R.dashboard, Icons.dashboard_outlined),
+    NavItem('Projects', R.projects, Icons.track_changes_outlined),
   ]),
   NavGroup('Manage', [
     NavItem('Orders', R.orders, Icons.receipt_long_outlined),
@@ -69,6 +72,7 @@ const kNavGroups = <NavGroup>[
     NavItem('Components', R.components, Icons.widgets_outlined),
     NavItem('Forms', R.forms, Icons.edit_note_outlined),
     NavItem('Settings', R.settings, Icons.settings_outlined),
+    NavItem('Profile', R.profile, Icons.person_outline),
   ]),
 ];
 
