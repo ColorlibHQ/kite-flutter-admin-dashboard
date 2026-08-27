@@ -11,10 +11,9 @@
 
 # Kite — Flutter Admin Dashboard Template
 
-## [Live Preview](https://demo.dashboardpack.com/kite/) · [Download APK](#) · [TestFlight](#)
+## [Live Preview](https://demo.dashboardpack.com/kite/) · [Documentation](https://docs.dashboardpack.com/kite-docs/) · [Get the code](#getting-started)
 
-<!-- TODO: build-along video. The one distribution channel proven to work in this niche. -->
-**[Watch the build-along on YouTube](#)**
+<!-- TODO: build-along video + mobile store builds. Restore the header links when they exist. -->
 
 Kite is a free, open-source **Flutter dashboard template** for teams who already ship a Flutter app
 and now need the admin panel to go with it — same models, same API client, same language, same
