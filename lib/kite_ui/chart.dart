@@ -45,7 +45,7 @@ class KiteLineChart extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
                 return Padding(
-                  padding: const EdgeInsets.only(right: 6),
+                  padding: const EdgeInsetsDirectional.only(end: 6),
                   child: Text(
                     value.round().toString(),
                     style: TextStyle(fontSize: 11, color: c.mutedForeground),

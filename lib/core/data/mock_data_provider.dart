@@ -205,5 +205,21 @@ class MockDataProvider implements DataProvider {
   }
 }
 
-/// Swap this one line for `RestDataProvider(...)` and every screen keeps working.
+/// The one line that decides where every screen gets its data.
+///
+/// Swap it for either of the shipped adapters and nothing above this line
+/// changes:
+///
+/// ```dart
+/// final dataProvider = Provider<DataProvider>(
+///   (ref) => RestDataProvider(baseUrl: 'https://api.example.com'),
+/// );
+///
+/// final dataProvider = Provider<DataProvider>(
+///   (ref) => SupabaseDataProvider(
+///     url: 'https://xyzcompany.supabase.co',
+///     anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+///   ),
+/// );
+/// ```
 final dataProvider = Provider<DataProvider>((ref) => MockDataProvider());

@@ -1,0 +1,74 @@
+{
+  "@@locale": "en",
+  "appName": "Kite",
+  "navOverview": "Overview",
+  "navManage": "Manage",
+  "navApps": "Apps",
+  "navBuild": "Build",
+  "navDashboard": "Dashboard",
+  "navProjects": "Projects",
+  "navOrders": "Orders",
+  "navCustomers": "Customers",
+  "navProducts": "Products",
+  "navInbox": "Inbox",
+  "navBoard": "Board",
+  "navCalendar": "Calendar",
+  "navChat": "Chat",
+  "navComponents": "Components",
+  "navForms": "Forms",
+  "navSettings": "Settings",
+  "navProfile": "Profile",
+  "actionSave": "Save",
+  "actionCancel": "Cancel",
+  "actionDelete": "Delete",
+  "actionEdit": "Edit",
+  "actionRefresh": "Refresh",
+  "actionExport": "Export",
+  "actionSearch": "Search",
+  "actionClear": "Clear",
+  "actionPrevious": "Previous",
+  "actionNext": "Next",
+  "actionSignIn": "Sign in",
+  "actionSignOut": "Sign out",
+  "signInTitle": "Sign in",
+  "signInSubtitle": "Any email works — this is the mock provider.",
+  "fieldEmail": "Email",
+  "fieldPassword": "Password",
+  "fieldName": "Name",
+  "forgotPassword": "Forgot password?",
+  "noAccount": "No account? Create one",
+  "lightMode": "Light mode",
+  "darkMode": "Dark mode",
+  "language": "Language",
+  "theme": "Theme",
+  "accent": "Accent",
+  "emptyTitle": "Nothing matches those filters",
+  "emptyMessage": "Try clearing the search or choosing a different status.",
+  "errorTitle": "Something went wrong",
+  "errorRetry": "Try again",
+  "pageOf": "Page {page} of {pages}",
+  "@pageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeOfTotal": "{first}–{last} of {total}",
+  "@rangeOfTotal": {
+    "placeholders": {
+      "first": {
+        "type": "int"
+      },
+      "last": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}

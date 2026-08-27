@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Route paths in one place so the router, the sidebar and every `context.go`
 /// call agree. Typed constants rather than string literals scattered around.
 abstract final class R {
@@ -35,9 +37,30 @@ abstract final class R {
 @immutable
 class NavItem {
   const NavItem(this.label, this.path, this.icon);
+
+  /// English label. Also the fallback if a translation is missing.
   final String label;
   final String path;
   final IconData icon;
+
+  /// Localised label. Kept as a lookup rather than a stored string so the
+  /// sidebar re-reads it when the locale changes.
+  String labelOf(L l) => switch (path) {
+    R.dashboard => l.navDashboard,
+    R.projects => l.navProjects,
+    R.orders => l.navOrders,
+    R.customers => l.navCustomers,
+    R.products => l.navProducts,
+    R.inbox => l.navInbox,
+    R.kanban => l.navBoard,
+    R.calendar => l.navCalendar,
+    R.chat => l.navChat,
+    R.components => l.navComponents,
+    R.forms => l.navForms,
+    R.settings => l.navSettings,
+    R.profile => l.navProfile,
+    _ => label,
+  };
 }
 
 /// The sidebar on desktop, the bottom bar on mobile — same source, so the two
@@ -50,6 +73,14 @@ class NavGroup {
   const NavGroup(this.label, this.items);
   final String label;
   final List<NavItem> items;
+
+  String labelOf(L l) => switch (label) {
+    'Overview' => l.navOverview,
+    'Manage' => l.navManage,
+    'Apps' => l.navApps,
+    'Build' => l.navBuild,
+    _ => label,
+  };
 }
 
 const kNavGroups = <NavGroup>[

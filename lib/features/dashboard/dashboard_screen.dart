@@ -327,7 +327,7 @@ class _FunnelCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: FractionallySizedBox(
                         widthFactor: _stages[i].$2 / top,
                         child: Container(

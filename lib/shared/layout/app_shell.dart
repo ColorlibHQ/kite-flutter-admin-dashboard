@@ -6,6 +6,7 @@ import '../../core/auth/session.dart';
 import '../../core/router/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../kite_ui/kite_ui.dart';
+import '../../l10n/app_localizations.dart';
 
 /// The persistent shell.
 ///
@@ -36,7 +37,9 @@ class AppShell extends ConsumerWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: c.card,
-                    border: Border(right: BorderSide(color: c.border)),
+                    // Directional: in RTL the sidebar moves to the right edge, so its
+                    // divider has to move with it.
+                    border: BorderDirectional(end: BorderSide(color: c.border)),
                   ),
                   child: _SidebarBody(location: location),
                 ),
@@ -95,7 +98,7 @@ class _SidebarBody extends StatelessWidget {
                     KiteSpace.xs,
                   ),
                   child: Text(
-                    group.label.toUpperCase(),
+                    group.labelOf(L.of(context)).toUpperCase(),
                     style: t.muted.copyWith(
                       fontSize: 10,
                       letterSpacing: 0.8,
@@ -147,7 +150,7 @@ class _NavTile extends StatelessWidget {
                 ),
                 const SizedBox(width: KiteSpace.md),
                 Text(
-                  item.label,
+                  item.labelOf(L.of(context)),
                   style: t.small.copyWith(
                     color: active ? c.foreground : c.mutedForeground,
                     fontWeight: active ? FontWeight.w600 : FontWeight.w500,
@@ -201,7 +204,7 @@ class _UserTile extends ConsumerWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Sign out',
+            tooltip: L.of(context).actionSignOut,
             iconSize: 18,
             color: c.mutedForeground,
             icon: const Icon(Icons.logout),
@@ -230,7 +233,9 @@ class _TopBar extends ConsumerWidget {
             (n.path != '/' && location.startsWith('${n.path}/')))
           n,
     ]..sort((a, b) => b.path.length.compareTo(a.path.length));
-    final title = matches.isEmpty ? 'Kite' : matches.first.label;
+    final title = matches.isEmpty
+        ? 'Kite'
+        : matches.first.labelOf(L.of(context));
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -251,7 +256,7 @@ class _TopBar extends ConsumerWidget {
           Text(title, style: t.large),
           const Spacer(),
           IconButton(
-            tooltip: isDark ? 'Light mode' : 'Dark mode',
+            tooltip: isDark ? L.of(context).lightMode : L.of(context).darkMode,
             iconSize: 18,
             color: c.mutedForeground,
             icon: Icon(

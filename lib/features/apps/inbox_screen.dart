@@ -247,7 +247,9 @@ class _MessageList extends StatelessWidget {
               const Spacer(),
               for (final f in const ['All', 'Unread', 'Starred'])
                 Padding(
-                  padding: const EdgeInsets.only(left: KiteSpace.xs),
+                  padding: const EdgeInsetsDirectional.only(
+                    start: KiteSpace.xs,
+                  ),
                   child: KiteButton.ghost(
                     onPressed: () => onFilter(f),
                     child: Text(

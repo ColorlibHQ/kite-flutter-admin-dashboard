@@ -48,7 +48,7 @@ class ResourceDetailScreen extends ConsumerWidget {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(KiteSpace.xl),
           child: Align(
-            alignment: Alignment.topLeft,
+            alignment: AlignmentDirectional.topStart,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 960),
               child: Column(
@@ -173,7 +173,7 @@ class _Row extends StatelessWidget {
           Expanded(
             child: spec.kind == ColKind.select
                 ? Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: AlignmentDirectional.centerStart,
                     child: KiteBadge(display, tone: _tone(display)),
                   )
                 : Text(display, style: t.p.copyWith(fontSize: 14)),

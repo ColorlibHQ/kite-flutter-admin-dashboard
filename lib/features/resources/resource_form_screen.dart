@@ -174,7 +174,7 @@ class _FormState extends ConsumerState<_Form> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: AlignmentDirectional.topStart,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
           child: Column(

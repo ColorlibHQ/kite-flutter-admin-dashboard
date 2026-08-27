@@ -180,7 +180,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: AlignmentDirectional.topStart,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1000),
           child: wide

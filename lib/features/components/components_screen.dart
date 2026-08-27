@@ -314,7 +314,7 @@ class _ComponentsScreenState extends State<ComponentsScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: AlignmentDirectional.topStart,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
           child: wide

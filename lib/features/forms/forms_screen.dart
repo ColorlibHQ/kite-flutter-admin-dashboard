@@ -103,7 +103,7 @@ class _FormsScreenState extends State<FormsScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: AlignmentDirectional.topStart,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 680),
           child: KiteCard(

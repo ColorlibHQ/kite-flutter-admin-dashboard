@@ -34,6 +34,7 @@ dependencies:
   trina_grid: ^2.3.0
 
   intl: any
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -42,3 +43,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true

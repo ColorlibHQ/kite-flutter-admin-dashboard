@@ -104,7 +104,7 @@ class KiteBarRow extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(999),
               child: Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: FractionallySizedBox(
                   widthFactor: (value / max).clamp(0.02, 1),
                   child: Container(

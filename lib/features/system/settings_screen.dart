@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth/session.dart';
+import '../../core/l10n/locale_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../kite_ui/kite_ui.dart';
+import '../../l10n/app_localizations.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -11,6 +13,8 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
+    final l = L.of(context);
     final controller = ref.read(themeProvider.notifier);
     final user = ref.watch(sessionProvider);
     final t = KiteText.of(context);
@@ -18,7 +22,7 @@ class SettingsScreen extends ConsumerWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
       child: Align(
-        alignment: Alignment.topLeft,
+        alignment: AlignmentDirectional.topStart,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
@@ -30,7 +34,7 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Theme',
+                      l.theme,
                       style: t.small.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: KiteSpace.sm),
@@ -54,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: KiteSpace.xl),
                     Text(
-                      'Accent',
+                      l.accent,
                       style: t.small.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: KiteSpace.sm),
@@ -72,6 +76,36 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              KiteCard(
+                title: l.language,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Arabic switches the whole app to right-to-left. It is in here '
+                      'on purpose — a layout that has never rendered RTL is usually '
+                      'full of hard-coded left padding nobody noticed.',
+                      style: t.muted,
+                    ),
+                    const SizedBox(height: KiteSpace.lg),
+                    Wrap(
+                      spacing: KiteSpace.sm,
+                      runSpacing: KiteSpace.sm,
+                      children: [
+                        for (final option in KiteLocale.values)
+                          ChoiceChip(
+                            label: Text(option.nativeName),
+                            selected: locale == option,
+                            onSelected: (_) =>
+                                ref.read(localeProvider.notifier).set(option),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: KiteSpace.xl),
               const SizedBox(height: KiteSpace.xl),
               KiteCard(
                 title: 'Account',

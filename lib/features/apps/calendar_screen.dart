@@ -149,7 +149,7 @@ class _EventRow extends StatelessWidget {
                   children: [
                     for (final p in event.people)
                       Padding(
-                        padding: const EdgeInsets.only(right: 4),
+                        padding: const EdgeInsetsDirectional.only(end: 4),
                         child: KiteTooltip(
                           message: p,
                           child: KiteAvatar(name: p, size: 22),
