@@ -58,6 +58,9 @@ class LEn extends L {
   String get navForms => 'Forms';
 
   @override
+  String get navWizard => 'Wizard';
+
+  @override
   String get navSettings => 'Settings';
 
   @override

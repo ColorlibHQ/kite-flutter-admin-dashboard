@@ -58,6 +58,9 @@ class LEs extends L {
   String get navForms => 'Formularios';
 
   @override
+  String get navWizard => 'Asistente';
+
+  @override
   String get navSettings => 'Ajustes';
 
   @override

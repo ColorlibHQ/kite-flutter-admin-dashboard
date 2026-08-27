@@ -58,6 +58,9 @@ class LAr extends L {
   String get navForms => 'النماذج';
 
   @override
+  String get navWizard => 'المعالج';
+
+  @override
   String get navSettings => 'الإعدادات';
 
   @override

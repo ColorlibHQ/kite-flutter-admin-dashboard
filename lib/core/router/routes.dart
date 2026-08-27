@@ -23,6 +23,7 @@ abstract final class R {
   static const chat = '/chat';
   static const components = '/components';
   static const forms = '/forms';
+  static const wizard = '/wizard';
   static const settings = '/settings';
   static const profile = '/profile';
 
@@ -57,6 +58,7 @@ class NavItem {
     R.chat => l.navChat,
     R.components => l.navComponents,
     R.forms => l.navForms,
+    R.wizard => l.navWizard,
     R.settings => l.navSettings,
     R.profile => l.navProfile,
     _ => label,
@@ -102,6 +104,7 @@ const kNavGroups = <NavGroup>[
   NavGroup('Build', [
     NavItem('Components', R.components, Icons.widgets_outlined),
     NavItem('Forms', R.forms, Icons.edit_note_outlined),
+    NavItem('Wizard', R.wizard, Icons.linear_scale_outlined),
     NavItem('Settings', R.settings, Icons.settings_outlined),
     NavItem('Profile', R.profile, Icons.person_outline),
   ]),

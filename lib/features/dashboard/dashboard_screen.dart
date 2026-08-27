@@ -153,7 +153,8 @@ class _StatRow extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: KiteSpace.lg,
       crossAxisSpacing: KiteSpace.lg,
-      childAspectRatio: columns == 1 ? 3.0 : 1.55,
+      // Wider than tall, but not so wide that the sparkline goes thready.
+      childAspectRatio: columns == 1 ? 2.6 : 1.35,
       children: [
         for (final (label, value, delta, tone, spark) in _stats)
           _TrendStat(
@@ -227,8 +228,13 @@ class _TrendStat extends StatelessWidget {
               ),
             ],
           ),
-          const Spacer(),
-          KiteSparkline(values: spark, color: accent, height: 34),
+          const SizedBox(height: KiteSpace.md),
+          // Fills whatever the card has left. On a wide screen the tiles grow
+          // taller with their width, and a pinned-height line stranded at the
+          // bottom of one is the odd-looking part.
+          Expanded(
+            child: KiteSparkline(values: spark, color: accent),
+          ),
         ],
       ),
     );

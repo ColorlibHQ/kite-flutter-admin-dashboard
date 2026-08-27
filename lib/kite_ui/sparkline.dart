@@ -13,56 +13,56 @@ class KiteSparkline extends StatelessWidget {
     super.key,
     required this.values,
     this.color,
-    this.height = 40,
+    this.height,
   });
 
   final List<double> values;
   final Color? color;
-  final double height;
+
+  /// Fixed height. Leave null inside an [Expanded] and the chart fills the
+  /// space instead — which is what keeps it in proportion on a wide screen,
+  /// where a pinned 34px line looks like an afterthought.
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     final c = KiteColors.of(context);
     final line = color ?? c.primary;
-    return SizedBox(
-      height: height,
-      child: LineChart(
-        LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: const FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          lineTouchData: const LineTouchData(enabled: false),
-          minY: values.reduce((a, b) => a < b ? a : b) * 0.92,
-          maxY: values.reduce((a, b) => a > b ? a : b) * 1.05,
-          lineBarsData: [
-            LineChartBarData(
-              spots: [
-                for (var i = 0; i < values.length; i++)
-                  FlSpot(i.toDouble(), values[i]),
-              ],
-              isCurved: true,
-              barWidth: 1.8,
-              color: line,
-              dotData: FlDotData(
-                show: true,
-                // Only the last point gets a dot — where the series ends is
-                // the part a reader actually looks for.
-                checkToShowDot: (spot, _) => spot.x == values.length - 1,
-                getDotPainter: (_, _, _, _) => FlDotCirclePainter(
-                  radius: 2.5,
-                  color: line,
-                  strokeWidth: 0,
-                ),
-              ),
-              belowBarData: BarAreaData(
-                show: true,
-                color: line.withValues(alpha: 0.12),
-              ),
+    final chart = LineChart(
+      LineChartData(
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
+        borderData: FlBorderData(show: false),
+        lineTouchData: const LineTouchData(enabled: false),
+        minY: values.reduce((a, b) => a < b ? a : b) * 0.92,
+        maxY: values.reduce((a, b) => a > b ? a : b) * 1.05,
+        lineBarsData: [
+          LineChartBarData(
+            spots: [
+              for (var i = 0; i < values.length; i++)
+                FlSpot(i.toDouble(), values[i]),
+            ],
+            isCurved: true,
+            barWidth: 1.8,
+            color: line,
+            dotData: FlDotData(
+              show: true,
+              // Only the last point gets a dot — where the series ends is
+              // the part a reader actually looks for.
+              checkToShowDot: (spot, _) => spot.x == values.length - 1,
+              getDotPainter: (_, _, _, _) =>
+                  FlDotCirclePainter(radius: 2.5, color: line, strokeWidth: 0),
             ),
-          ],
-        ),
+            belowBarData: BarAreaData(
+              show: true,
+              color: line.withValues(alpha: 0.12),
+            ),
+          ),
+        ],
       ),
     );
+
+    return height == null ? chart : SizedBox(height: height, child: chart);
   }
 }
 

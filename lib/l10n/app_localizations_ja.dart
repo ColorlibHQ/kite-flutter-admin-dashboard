@@ -58,6 +58,9 @@ class LJa extends L {
   String get navForms => 'フォーム';
 
   @override
+  String get navWizard => 'ウィザード';
+
+  @override
   String get navSettings => '設定';
 
   @override

@@ -58,6 +58,9 @@ class LFr extends L {
   String get navForms => 'Formulaires';
 
   @override
+  String get navWizard => 'Assistant';
+
+  @override
   String get navSettings => 'Paramètres';
 
   @override

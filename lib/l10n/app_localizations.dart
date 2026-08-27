@@ -199,6 +199,12 @@ abstract class L {
   /// **'Forms'**
   String get navForms;
 
+  /// No description provided for @navWizard.
+  ///
+  /// In en, this message translates to:
+  /// **'Wizard'**
+  String get navWizard;
+
   /// No description provided for @navSettings.
   ///
   /// In en, this message translates to:
