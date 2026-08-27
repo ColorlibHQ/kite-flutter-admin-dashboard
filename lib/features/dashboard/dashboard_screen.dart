@@ -144,17 +144,7 @@ class _StatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final columns = KiteBreak.isMobile(context)
-        ? 1
-        : (KiteBreak.isTablet(context) ? 2 : 4);
-    return GridView.count(
-      crossAxisCount: columns,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: KiteSpace.lg,
-      crossAxisSpacing: KiteSpace.lg,
-      // Wider than tall, but not so wide that the sparkline goes thready.
-      childAspectRatio: columns == 1 ? 2.6 : 1.35,
+    return KiteStatGrid(
       children: [
         for (final (label, value, delta, tone, spark) in _stats)
           _TrendStat(
@@ -191,7 +181,14 @@ class _TrendStat extends StatelessWidget {
     final good = tone == KiteTone.success;
     final accent = good ? const Color(0xFF0C6B62) : const Color(0xFFB03D0B);
     return Container(
-      padding: const EdgeInsets.all(KiteSpace.xl),
+      // Tighter at the bottom than the sides: the chart runs to the card edge,
+      // so it needs less breathing room under it than the text needs beside it.
+      padding: const EdgeInsets.fromLTRB(
+        KiteSpace.xl,
+        KiteSpace.xl,
+        KiteSpace.xl,
+        KiteSpace.lg,
+      ),
       decoration: BoxDecoration(
         color: c.card,
         border: Border.all(color: c.border),

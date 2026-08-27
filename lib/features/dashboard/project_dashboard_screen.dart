@@ -75,17 +75,10 @@ class _Stats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final columns = KiteBreak.isMobile(context)
-        ? 1
-        : (KiteBreak.isTablet(context) ? 2 : 4);
-    return GridView.count(
-      crossAxisCount: columns,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: KiteSpace.lg,
-      crossAxisSpacing: KiteSpace.lg,
-      childAspectRatio: columns == 1 ? 3.2 : 2.0,
-      children: const [
+    // Shorter than the main dashboard's tiles: these carry no sparkline.
+    return const KiteStatGrid(
+      height: 128,
+      children: [
         KiteStat(
           label: 'Open issues',
           value: '47',
