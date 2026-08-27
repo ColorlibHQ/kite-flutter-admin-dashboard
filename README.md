@@ -11,7 +11,7 @@
 
 # Kite — Flutter Admin Dashboard Template
 
-## [Live Preview](https://kite.dashboardpack.com) · [Download APK](#) · [TestFlight](#)
+## [Live Preview](https://demo.dashboardpack.com/kite/) · [Download APK](#) · [TestFlight](#)
 
 <!-- TODO: build-along video. The one distribution channel proven to work in this niche. -->
 **[Watch the build-along on YouTube](#)**
@@ -63,12 +63,13 @@ flutter run
 
 ## Docs
 
-**[Full documentation →](https://colorlibhq.github.io/kite-flutter-admin-dashboard/)**
+**[Full documentation →](https://docs.dashboardpack.com/kite-docs/)**
 — getting started, connecting a backend, adding a resource, theming, localisation
 and deployment. Source in [`docs/site/`](docs/site/).
 
 - [Architecture](docs/ARCHITECTURE.md) — the one rule, the layout, and the `DataProvider` contract
 - [Distribution](docs/DISTRIBUTION.md) — why this README is ordered the way it is
+- [Deploy](docs/DEPLOY.md) — R2 buckets, base-href, purging, and what the SEO worker already handles
 - [Spike A](docs/SPIKE-A.md) / [Spikes B & C](docs/SPIKE-B-C.md) — the measurements the build rests on
 
 ## License
