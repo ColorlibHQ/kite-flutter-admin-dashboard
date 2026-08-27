@@ -15,6 +15,7 @@ export 'donut.dart';
 export 'feedback.dart';
 export 'format.dart';
 export 'inputs.dart';
+export 'menu.dart';
 export 'sparkline.dart';
 export 'stat_grid.dart';
 export 'tokens.dart';
