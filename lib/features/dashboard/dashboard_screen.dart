@@ -84,7 +84,22 @@ class DashboardScreen extends ConsumerWidget {
             const _ActivityCard(),
           ],
           const SizedBox(height: KiteSpace.xl),
-          const _RecentOrdersCard(),
+          if (wide)
+            const IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(flex: 3, child: _RecentOrdersCard()),
+                  SizedBox(width: KiteSpace.xl),
+                  Expanded(flex: 2, child: _OrderStatusCard()),
+                ],
+              ),
+            )
+          else ...[
+            const _RecentOrdersCard(),
+            const SizedBox(height: KiteSpace.xl),
+            const _OrderStatusCard(),
+          ],
         ],
       ),
     );
@@ -414,6 +429,7 @@ class _TopProductsCard extends ConsumerWidget {
         error: (e, _) =>
             SizedBox(height: 180, child: ErrorState(message: '$e')),
         data: (result) => Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final row in result.rows)
@@ -440,6 +456,12 @@ class _TopProductsCard extends ConsumerWidget {
                   ],
                 ),
               ),
+            const SizedBox(height: KiteSpace.sm),
+            const KiteSeparator(),
+            const SizedBox(height: KiteSpace.md),
+            const _MiniFact(label: 'Units sold this month', value: '8,412'),
+            const _MiniFact(label: 'Average order value', value: r'$83.27'),
+            const _MiniFact(label: 'Out of stock', value: '3 SKUs'),
           ],
         ),
       ),
@@ -555,6 +577,84 @@ class _RecentOrdersCard extends ConsumerWidget {
         data: (result) => Column(
           children: [for (final row in result.rows) _OrderRow(row: row)],
         ),
+      ),
+    );
+  }
+}
+
+/// Sits beside the orders list. A donut is the one shape this page does not
+/// already use, and status mix is the obvious question to ask of the table
+/// next to it — the two cards answer each other.
+class _OrderStatusCard extends StatelessWidget {
+  const _OrderStatusCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = KiteColors.of(context);
+    final t = KiteText.of(context);
+    final slices = [
+      const KiteSlice(label: 'Paid', value: 1412, color: Color(0xFF0C6B62)),
+      const KiteSlice(label: 'Shipped', value: 986, color: Color(0xFF2A9D8F)),
+      const KiteSlice(label: 'Pending', value: 604, color: Color(0xFFC08A19)),
+      const KiteSlice(label: 'Refunded', value: 271, color: Color(0xFF0663CE)),
+      const KiteSlice(label: 'Cancelled', value: 139, color: Color(0xFFB03D0B)),
+    ];
+
+    return KiteCard(
+      title: 'Order status',
+      trailing: const KiteBadge('This month', tone: KiteTone.neutral),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          KiteDonut(
+            slices: slices,
+            centerLabel: 'orders',
+            centerValue: KiteFormat.count(
+              slices.fold<double>(0, (s, e) => s + e.value).round(),
+            ),
+          ),
+          const SizedBox(height: KiteSpace.lg),
+          const KiteSeparator(),
+          const SizedBox(height: KiteSpace.md),
+          Row(
+            children: [
+              Icon(Icons.schedule, size: 14, color: c.mutedForeground),
+              const SizedBox(width: KiteSpace.sm),
+              Expanded(
+                child: Text(
+                  'Average time to ship',
+                  style: t.muted.copyWith(fontSize: 12),
+                ),
+              ),
+              Text(
+                '1d 4h',
+                style: t.small.copyWith(
+                  fontSize: 12,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: KiteSpace.sm),
+          Row(
+            children: [
+              Icon(
+                Icons.local_shipping_outlined,
+                size: 14,
+                color: c.mutedForeground,
+              ),
+              const SizedBox(width: KiteSpace.sm),
+              Expanded(
+                child: Text(
+                  'Awaiting dispatch',
+                  style: t.muted.copyWith(fontSize: 12),
+                ),
+              ),
+              const KiteBadge('604', tone: KiteTone.warning),
+            ],
+          ),
+        ],
       ),
     );
   }
