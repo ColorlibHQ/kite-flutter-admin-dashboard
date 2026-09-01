@@ -9,6 +9,10 @@
  * running demo, not a mockup — but it sits in a composition that names the
  * thing.
  *
+ * No version numbers on the card. A pinned framework version is wrong within
+ * weeks and there is no way to notice, because the image lives on GitHub's CDN
+ * rather than in the repo's build. Everything stated here stays true.
+ *
  * Usage:
  *   node scripts/social-preview.mjs
  *
@@ -136,7 +140,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
     <div class="chips">
       <div class="chip free">Free &amp; MIT</div>
       <div class="chip">22 screens</div>
-      <div class="chip">Flutter 3.47</div>
+      <div class="chip">Light &amp; dark</div>
     </div>
   </div>
   <div class="shot"><img src="${shotUri}"></div>
