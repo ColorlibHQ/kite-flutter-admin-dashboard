@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/auth/session.dart';
+import '../../core/l10n/labels.dart';
 import '../../core/l10n/locale_controller.dart';
+import '../../core/preferences/preferences_store.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -18,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final controller = ref.read(themeProvider.notifier);
     final user = ref.watch(sessionProvider);
     final t = KiteText.of(context);
+    final store = ref.watch(preferencesStoreProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
@@ -28,8 +31,25 @@ class SettingsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              ListenableBuilder(
+                listenable: store,
+                builder: (context, _) => !store.saveFailed
+                    ? const SizedBox.shrink()
+                    : Semantics(
+                        liveRegion: true,
+                        child: Column(
+                          children: [
+                            Text(l.preferenceSaveFailed),
+                            KiteButton.ghost(
+                              onPressed: store.retry,
+                              child: Text(l.errorRetry),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
               KiteCard(
-                title: 'Appearance',
+                title: l.appearance,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -38,23 +58,21 @@ class SettingsScreen extends ConsumerWidget {
                       style: t.small.copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: KiteSpace.sm),
-                    SegmentedButton<ThemeMode>(
-                      segments: const [
-                        ButtonSegment(
-                          value: ThemeMode.light,
-                          label: Text('Light'),
-                        ),
-                        ButtonSegment(
-                          value: ThemeMode.system,
-                          label: Text('System'),
-                        ),
-                        ButtonSegment(
-                          value: ThemeMode.dark,
-                          label: Text('Dark'),
-                        ),
+                    Wrap(
+                      spacing: KiteSpace.sm,
+                      runSpacing: KiteSpace.sm,
+                      children: [
+                        for (final mode in ThemeMode.values)
+                          ChoiceChip(
+                            label: Text(switch (mode) {
+                              ThemeMode.light => l.light,
+                              ThemeMode.dark => l.dark,
+                              ThemeMode.system => l.systemMode,
+                            }),
+                            selected: theme.mode == mode,
+                            onSelected: (_) => controller.setMode(mode),
+                          ),
                       ],
-                      selected: {theme.mode},
-                      onSelectionChanged: (s) => controller.setMode(s.first),
                     ),
                     const SizedBox(height: KiteSpace.xl),
                     Text(
@@ -67,7 +85,11 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         for (final a in KiteAccent.values)
                           ChoiceChip(
-                            label: Text(a.label),
+                            label: Text(switch (a) {
+                              KiteAccent.slate => l.accentSlate,
+                              KiteAccent.blue => l.accentBlue,
+                              KiteAccent.violet => l.accentViolet,
+                            }),
                             selected: theme.accent == a,
                             onSelected: (_) => controller.setAccent(a),
                           ),
@@ -76,18 +98,14 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: KiteSpace.xl),
               KiteCard(
                 title: l.language,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Arabic switches the whole app to right-to-left. It is in here '
-                      'on purpose — a layout that has never rendered RTL is usually '
-                      'full of hard-coded left padding nobody noticed.',
-                      style: t.muted,
-                    ),
+                    Text(l.languageHelp, style: t.muted),
                     const SizedBox(height: KiteSpace.lg),
                     Wrap(
                       spacing: KiteSpace.sm,
@@ -106,38 +124,32 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: KiteSpace.xl),
-              const SizedBox(height: KiteSpace.xl),
               KiteCard(
-                title: 'Account',
+                title: l.account,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Row(label: 'Name', value: user?.name ?? '—'),
-                    _Row(label: 'Email', value: user?.email ?? '—'),
-                    _Row(label: 'Role', value: user?.role ?? '—'),
+                    _Row(label: l.fieldName, value: user?.name ?? '—'),
+                    _Row(label: l.fieldEmail, value: user?.email ?? '—'),
+                    _Row(
+                      label: l.role,
+                      value: roleLabel(l, user?.role ?? UserRole.none),
+                    ),
                     const SizedBox(height: KiteSpace.lg),
                     KiteButton.destructive(
                       onPressed: () =>
                           ref.read(sessionProvider.notifier).signOut(),
-                      child: const Text('Sign out'),
+                      child: Text(l.actionSignOut),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: KiteSpace.xl),
               KiteCard(
-                title: 'Data source',
+                title: l.dataSource,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Running on MockDataProvider — search, filter, sort and '
-                      'pagination all execute server-side against in-memory '
-                      'tables. Swap one line in mock_data_provider.dart for a '
-                      'REST or Supabase adapter and every screen keeps working.',
-                      style: t.muted,
-                    ),
-                  ],
+                  children: [Text(l.dataSourceHelp, style: t.muted)],
                 ),
               ),
             ],

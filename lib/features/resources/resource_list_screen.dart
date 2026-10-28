@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kite_ui/kite_ui.dart';
 
+import '../../core/auth/session.dart';
 import '../../core/data/data_provider.dart';
+import '../../core/l10n/labels.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/states.dart';
 import 'resource_providers.dart';
 import 'resource_schema.dart';
@@ -15,6 +18,7 @@ class ResourceListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = L.of(context);
     final spec = kResources[resource]!;
     final async = ref.watch(listProvider(resource));
     final params = ref.watch(listParamsProvider.notifier).of(resource);
@@ -36,9 +40,9 @@ class ResourceListScreen extends ConsumerWidget {
               data: (result) {
                 if (result.rows.isEmpty) {
                   return EmptyState(
-                    title: 'Nothing matches those filters',
-                    message: 'Try clearing the search or choosing a different status.',
-                    actionLabel: 'Reset filters',
+                    title: l.emptyTitle,
+                    message: l.emptyMessage,
+                    actionLabel: l.actionClear,
                     onAction: () =>
                         ref.read(listParamsProvider.notifier).reset(resource),
                   );
@@ -48,12 +52,13 @@ class ResourceListScreen extends ConsumerWidget {
                     Expanded(
                       child: KiteDataTable(
                         paginate: false,
+                        rowActionTooltip: l.openRecord,
                         onRowTap: (i) =>
                             context.go('/$resource/${result.rows[i]['id']}'),
                         columns: [
                           for (final f in spec.listFields)
                             TrinaColumn(
-                              title: f.title,
+                              title: fieldLabel(l, f.title),
                               field: f.field,
                               readOnly: true,
                               textAlign:
@@ -65,6 +70,8 @@ class ResourceListScreen extends ConsumerWidget {
                                 ColKind.number => TrinaColumnType.number(),
                                 ColKind.money => TrinaColumnType.currency(
                                   symbol: r'$',
+                                  locale: Localizations.localeOf(context)
+                                      .toLanguageTag(),
                                   decimalDigits: 2,
                                 ),
                                 _ => TrinaColumnType.text(),
@@ -76,7 +83,14 @@ class ResourceListScreen extends ConsumerWidget {
                             TrinaRow(
                               cells: {
                                 for (final f in spec.listFields)
-                                  f.field: TrinaCell(value: row[f.field] ?? ''),
+                                  f.field: TrinaCell(
+                                    value: f.kind == ColKind.select
+                                        ? statusLabel(
+                                            l,
+                                            '${row[f.field] ?? ''}',
+                                          )
+                                        : row[f.field] ?? '',
+                                  ),
                               },
                             ),
                         ],
@@ -108,6 +122,7 @@ class _Toolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = KiteColors.of(context);
     final t = KiteText.of(context);
+    final l = L.of(context);
     ref.watch(listParamsProvider);
     final notifier = ref.read(listParamsProvider.notifier);
     final params = notifier.of(resource);
@@ -121,7 +136,7 @@ class _Toolbar extends ConsumerWidget {
         SizedBox(
           width: 240,
           child: KiteInput(
-            placeholder: 'Search $resource…',
+            placeholder: l.searchResource(resourceLabel(l, resource)),
             leading: Icon(Icons.search, size: 16, color: c.mutedForeground),
             onChanged: (v) =>
                 notifier.update(resource, params.copyWith(search: v, page: 1)),
@@ -129,7 +144,7 @@ class _Toolbar extends ConsumerWidget {
         ),
         for (final s in spec.statuses)
           _FilterChip(
-            label: s,
+            label: statusLabel(l, s),
             selected: active == s,
             onTap: () => notifier.update(
               resource,
@@ -145,23 +160,24 @@ class _Toolbar extends ConsumerWidget {
           leading: const Icon(Icons.refresh, size: 16),
           onPressed: () {
             ref.invalidate(listProvider(resource));
-            KiteToast.show(context, title: 'Refreshed');
+            KiteToast.show(context, title: l.refreshed);
           },
-          child: const Text('Refresh'),
+          child: Text(l.actionRefresh),
         ),
-        KiteButton(
-          leading: const Icon(Icons.add, size: 16),
-          onPressed: () => context.go('/$resource/new'),
-          child: Text('New ${spec.singular.toLowerCase()}'),
-        ),
+        if (ref.watch(sessionProvider)?.role.canWrite ?? false)
+          KiteButton(
+            leading: const Icon(Icons.add, size: 16),
+            onPressed: () => context.go('/$resource/new'),
+            child: Text(l.newResource(fieldLabel(l, spec.singular))),
+          ),
         KiteTooltip(
-          message: 'Double-tap any row to open it',
+          message: l.openRecord,
           child: Icon(Icons.help_outline, size: 16, color: c.mutedForeground),
         ),
         if (params.search.isNotEmpty || active != null)
           KiteButton.ghost(
             onPressed: () => notifier.reset(resource),
-            child: Text('Clear', style: t.small),
+            child: Text(l.actionClear, style: t.small),
           ),
       ],
     );
@@ -181,30 +197,15 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = KiteColors.of(context);
-    final t = KiteText.of(context);
-    return Material(
-      color: selected ? c.primary : c.card,
-      borderRadius: KiteRadius.allSm,
-      child: InkWell(
-        borderRadius: KiteRadius.allSm,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: KiteSpace.md,
-            vertical: 9,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(color: selected ? c.primary : c.border),
-            borderRadius: KiteRadius.allSm,
-          ),
-          child: Text(
-            label,
-            style: t.small.copyWith(
-              color: selected ? c.primaryForeground : c.mutedForeground,
-            ),
-          ),
-        ),
-      ),
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      backgroundColor: c.card,
+      selectedColor: c.primary,
+      labelStyle: KiteText.of(context).small
+          .copyWith(color: selected ? c.primaryForeground : c.mutedForeground),
     );
   }
 }
@@ -225,20 +226,24 @@ class _Pager extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = KiteText.of(context);
+    final l = L.of(context);
     final notifier = ref.read(listParamsProvider.notifier);
     final first = (params.page - 1) * params.perPage + 1;
     final last = (first + params.perPage - 1).clamp(first, total);
     final pages = (total / params.perPage).ceil();
 
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: KiteSpace.sm,
+      runSpacing: KiteSpace.sm,
       children: [
-        Text('$first–$last of $total', style: t.muted),
-        const Spacer(),
+        Text(l.rangeOfTotal(first, last, total), style: t.muted),
         KiteButton.outline(
           enabled: params.page > 1,
           onPressed: () =>
               notifier.update(resource, params.copyWith(page: params.page - 1)),
-          child: const Text('Previous'),
+          child: Text(l.actionPrevious),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: KiteSpace.md),
@@ -248,7 +253,7 @@ class _Pager extends ConsumerWidget {
           enabled: params.page < pages,
           onPressed: () =>
               notifier.update(resource, params.copyWith(page: params.page + 1)),
-          child: const Text('Next'),
+          child: Text(l.actionNext),
         ),
       ],
     );

@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kite_ui/kite_ui.dart';
 
+import '../../core/auth/session.dart';
 import '../../core/data/data_provider.dart';
-import '../../core/data/mock_data_provider.dart';
+import '../../core/data/data_source.dart';
+import '../../core/l10n/labels.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/states.dart';
 import 'resource_providers.dart';
 import 'resource_schema.dart';
@@ -36,6 +39,7 @@ class ResourceDetailScreen extends ConsumerWidget {
     final spec = kResources[resource]!;
     final async = ref.watch(recordProvider((resource, id)));
     final t = KiteText.of(context);
+    final l = L.of(context);
 
     return async.when(
       loading: () => const LoadingState(),
@@ -59,37 +63,51 @@ class ResourceDetailScreen extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(child: Text(title, style: t.h2)),
-                      KiteButton.outline(
-                        leading: const Icon(Icons.edit_outlined, size: 15),
-                        onPressed: () => context.go('/$resource/$id/edit'),
-                        child: const Text('Edit'),
-                      ),
+                      if (ref.watch(sessionProvider)?.role.canWrite ?? false)
+                        KiteButton.outline(
+                          leading: const Icon(Icons.edit_outlined, size: 15),
+                          onPressed: () => context.go('/$resource/$id/edit'),
+                          child: Text(l.actionEdit),
+                        ),
                       const SizedBox(width: KiteSpace.sm),
-                      KiteButton.destructive(
-                        onPressed: () async {
-                          final ok = await kiteConfirm(
-                            context,
-                            title: 'Delete $title?',
-                            message: 'This removes the record permanently and cannot be undone.',
-                          );
-                          if (!ok || !context.mounted) return;
-                          await ref.read(dataProvider).delete(resource, id);
-                          if (!context.mounted) return;
-                          ref.invalidate(listProvider(resource));
-                          context.go('/$resource');
-                          KiteToast.show(
-                            context,
-                            title: '$title deleted',
-                            tone: KiteTone.danger,
-                          );
-                        },
-                        child: const Text('Delete'),
-                      ),
+                      if (ref.watch(sessionProvider)?.role.canDelete ?? false)
+                        KiteButton.destructive(
+                          onPressed: () async {
+                            final ok = await kiteConfirm(
+                              context,
+                              title: l.deleteRecord(title),
+                              message: l.deleteWarning,
+                            );
+                            if (!ok || !context.mounted) return;
+                            try {
+                              await ref.read(dataProvider).delete(resource, id);
+                            } on Object {
+                              if (context.mounted) {
+                                KiteToast.show(
+                                  context,
+                                  title: l.errorTitle,
+                                  description: l.authConnectionError,
+                                  tone: KiteTone.danger,
+                                );
+                              }
+                              return;
+                            }
+                            if (!context.mounted) return;
+                            ref.invalidate(listProvider(resource));
+                            context.go('/$resource');
+                            KiteToast.show(
+                              context,
+                              title: l.recordDeleted(title),
+                              tone: KiteTone.danger,
+                            );
+                          },
+                          child: Text(l.actionDelete),
+                        ),
                     ],
                   ),
                   const SizedBox(height: KiteSpace.xl),
                   KiteCard(
-                    title: 'Details',
+                    title: l.details,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
@@ -124,12 +142,13 @@ class _Breadcrumb extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = KiteColors.of(context);
     final t = KiteText.of(context);
+    final l = L.of(context);
     return Row(
       children: [
         InkWell(
           onTap: () => context.go('/$resource'),
           child: Text(
-            spec.name[0].toUpperCase() + spec.name.substring(1),
+            resourceLabel(l, resource),
             style: t.muted.copyWith(color: c.mutedForeground),
           ),
         ),
@@ -159,9 +178,16 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = KiteText.of(context);
+    final l = L.of(context);
     final display = switch (spec.kind) {
-      ColKind.money => KiteFormat.money(value),
-      ColKind.number => KiteFormat.count(value),
+      ColKind.money => KiteFormat.money(
+        value,
+        locale: Localizations.localeOf(context).toLanguageTag(),
+      ),
+      ColKind.number => KiteFormat.count(
+        value,
+        locale: Localizations.localeOf(context).toLanguageTag(),
+      ),
       _ => value == null || '$value'.isEmpty ? '—' : '$value',
     };
     return Padding(
@@ -169,12 +195,18 @@ class _Row extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 160, child: Text(spec.title, style: t.muted)),
+          SizedBox(
+            width: 160,
+            child: Text(fieldLabel(l, spec.title), style: t.muted),
+          ),
           Expanded(
             child: spec.kind == ColKind.select
                 ? Align(
                     alignment: AlignmentDirectional.centerStart,
-                    child: KiteBadge(display, tone: _tone(display)),
+                    child: KiteBadge(
+                      statusLabel(l, display),
+                      tone: _tone(display),
+                    ),
                   )
                 : Text(display, style: t.p.copyWith(fontSize: 14)),
           ),

@@ -31,6 +31,7 @@
     <a href="structure.html">Project structure</a>
     <a href="screens.html">Screens</a>
     <h4>Build on it</h4>
+    <a href="auth.html">Authentication & roles</a>
     <a href="data.html">Data layer</a>
     <a href="resources.html">Adding a resource</a>
     <a href="routing.html" class="here">Routing</a>
@@ -85,18 +86,21 @@
   ],
 )</code></pre>
 <p>
-  The five auth screens and the 500 page are declared <em>outside</em> the shell,
+  The five auth screens are declared <em>outside</em> the shell,
   so they render standalone.
 </p>
 
 <h2>The guard</h2>
-<pre><code>redirect: (context, state) {
-  final signedIn = ref.read(sessionProvider) != null;
-  final onAuth = R.isAuthRoute(state.matchedLocation);
-  if (!signedIn && !onAuth) return R.signIn;
-  if (signedIn && onAuth) return R.dashboard;
-  return null;
-},</code></pre>
+<pre><code>redirect: (context, state) =&gt; authRedirect(
+  signedIn: ref.read(sessionProvider) != null,
+  location: state.uri,
+),</code></pre>
+<p>
+  <code>auth_redirect.dart</code> preserves a bookmarked path, query, and
+  fragment in a local <code>from</code> parameter. After sign-in, the user
+  returns there instead of always landing on the dashboard. External return
+  URLs and authentication loops fall back to the dashboard.
+</p>
 <p>
   It runs on every navigation. Signing in or out re-evaluates it immediately
   rather than on the next navigation, because a small <code>ChangeNotifier</code>

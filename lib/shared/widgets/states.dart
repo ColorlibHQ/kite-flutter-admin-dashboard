@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:kite_ui/kite_ui.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Honest empty, loading and error states.
 ///
 /// Free templates habitually stop at the happy path — a grid full of lorem and
@@ -16,6 +18,7 @@ class LoadingState extends StatelessWidget {
       width: 22,
       height: 22,
       child: CircularProgressIndicator(
+        semanticsLabel: L.of(context).loading,
         strokeWidth: 2,
         color: KiteColors.of(context).mutedForeground,
       ),
@@ -85,7 +88,7 @@ class ErrorState extends StatelessWidget {
             Icon(Icons.error_outline, size: 32, color: c.destructive),
             const SizedBox(height: KiteSpace.lg),
             Text(
-              'Something went wrong',
+              L.of(context).errorTitle,
               style: t.large,
               textAlign: TextAlign.center,
             ),
@@ -96,7 +99,7 @@ class ErrorState extends StatelessWidget {
               const SizedBox(height: KiteSpace.xl),
               KiteButton.outline(
                 onPressed: onRetry,
-                child: const Text('Try again'),
+                child: Text(L.of(context).errorRetry),
               ),
             ],
           ],

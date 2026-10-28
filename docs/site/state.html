@@ -31,6 +31,7 @@
     <a href="structure.html">Project structure</a>
     <a href="screens.html">Screens</a>
     <h4>Build on it</h4>
+    <a href="auth.html">Authentication & roles</a>
     <a href="data.html">Data layer</a>
     <a href="resources.html">Adding a resource</a>
     <a href="routing.html">Routing</a>
@@ -108,16 +109,19 @@
 ref.invalidate(listProvider(resource));
 ref.invalidate(recordProvider((resource, id)));</code></pre>
 
-<h2>The session is in-memory on purpose</h2>
+<h2>Sessions and persisted preferences</h2>
 <p>
-  Signing in sets a <code>SessionUser</code>; reloading the page signs you out.
-  Persisting it would mean picking a storage package and a token format on your
-  behalf — decisions that belong to your auth provider, not to a template.
+  Demo identities remain in memory. Configuring Supabase switches to verified
+  identities, restored sessions, token refresh, email verification, and password
+  recovery. Roles are loaded from a protected server table, not user metadata.
+  See <a href="auth.html">Authentication and roles</a>.
 </p>
 <p>
-  Swap <code>SessionController.signIn</code> for a real call and the guard,
-  redirects and every screen keep working unchanged. If you want persistence,
-  that method and <code>build()</code> are the two places to touch.
+  Theme mode, accent, and locale load from <code>PreferencesStore</code> before
+  the first frame. Controllers update immediately and serialize disk writes;
+  Settings offers a retry if saving fails. Display settings contain no tokens.
+  Native sessions and PKCE verifiers use secure storage; web sessions use the
+  SDK's browser storage.
 </p>
 
 <h2>Local widget state stays local</h2>

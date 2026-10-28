@@ -1,12 +1,12 @@
 {
-    "name": "kite",
-    "short_name": "kite",
+    "name": "Kite",
+    "short_name": "Kite",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#0F172A",
+    "theme_color": "#0F172A",
+    "description": "Kite — a Flutter admin dashboard with charts, resource management, and adaptable themes.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

@@ -32,7 +32,7 @@ void main() {
   test('signOut clears the session', () async {
     final notifier = container.read(sessionProvider.notifier);
     await notifier.signIn(email: 'admin@kite.dev');
-    notifier.signOut();
+    await notifier.signOut();
     expect(container.read(sessionProvider), isNull);
   });
 }

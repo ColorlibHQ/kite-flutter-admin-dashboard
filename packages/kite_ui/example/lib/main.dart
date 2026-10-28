@@ -56,9 +56,9 @@ class DashboardScreen extends StatelessWidget {
               // Height is explicit, so these stay the same size on a phone and
               // on a 32-inch monitor. That is the whole reason KiteStatGrid
               // exists instead of a GridView with a childAspectRatio.
-              KiteStatGrid(
+              const KiteStatGrid(
                 height: 132,
-                children: const [
+                children: [
                   KiteStat(
                     label: 'Revenue',
                     value: r'$284,120',
@@ -80,10 +80,10 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: KiteSpace.lg),
-              KiteCard(
+              const KiteCard(
                 title: 'Revenue',
-                trailing: const KiteBadge('Last 60 days'),
-                child: const SizedBox(
+                trailing: KiteBadge('Last 60 days'),
+                child: SizedBox(
                   height: 220,
                   child: KiteSparkline(values: _revenue),
                 ),

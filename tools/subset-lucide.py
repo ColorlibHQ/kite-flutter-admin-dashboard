@@ -20,6 +20,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 try:
     from fontTools import subset
@@ -43,8 +44,8 @@ def package_root(name: str) -> Path | None:
         if pkg["name"] == name:
             uri = pkg["rootUri"]
             if uri.startswith("file://"):
-                return Path(uri[7:])
-            return (cfg.parent / uri).resolve()
+                return Path(unquote(urlparse(uri).path))
+            return (cfg.parent / unquote(uri)).resolve()
     return None
 
 
@@ -52,9 +53,10 @@ def used_icon_names() -> set[str]:
     """Every LucideIcons.<name> reachable in this app."""
     names: set[str] = set()
     roots = [ROOT / "lib"]
-    shadcn = package_root("shadcn_ui")
-    if shadcn:
-        roots.append(shadcn / "lib")
+    for name in ("kite_ui", "shadcn_ui", "trina_grid"):
+        package = package_root(name)
+        if package:
+            roots.append(package / "lib")
     for root in roots:
         if not root.exists():
             continue

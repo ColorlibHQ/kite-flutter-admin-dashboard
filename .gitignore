@@ -1,11 +1,13 @@
 .DS_Store
 .dart_tool/
+.flutter-plugins-dependencies
 .packages
 build/
 *.iml
 .idea/
 .vscode/
-pubspec.lock
+**/pubspec.lock
+!/pubspec.lock
 ios/Pods/
 ios/.symlinks/
 macos/Pods/
@@ -13,5 +15,11 @@ android/.gradle/
 android/local.properties
 *.g.dart
 *.freezed.dart
-/coverage/
+coverage/
 node_modules/
+
+.fvm/
+
+config/*.local.json
+
+.tools/

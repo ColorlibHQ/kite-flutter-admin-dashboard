@@ -30,9 +30,10 @@ python3 tools/subset-lucide.py build/web
 `--base-href` must match the R2 prefix or every asset 404s.
 
 `KITE_DEMO=true` starts the hosted demo already signed in. Without it the
-first thing a visitor from a link sees is a login form, which is a wall in
-front of the thing they came to look at. Leave it off for any build people
-clone and run — they should get the real auth flow.
+first screen is the demo sign-in, prefilled with `admin@kite.dev` / `password`.
+Visitors can sign out of the hosted preview to inspect this form. Clone-and-run
+builds keep the form; production builds use Supabase and empty fields. Never
+pass staging configuration to the public demo build.
 
 ## Demo
 
@@ -40,9 +41,12 @@ clone and run — they should get the real auth flow.
 every time.
 
 ```bash
+# Back up before replacing the prefix; use a release-specific ignored directory.
+rclone copy r2pro:dashboardpack-demos/kite/ build/ops/previous-demo/
 rclone sync build/web/ r2pro:dashboardpack-demos/kite/ --dry-run
 rclone sync build/web/ r2pro:dashboardpack-demos/kite/
 rclone check build/web/ r2pro:dashboardpack-demos/kite/   # expect "0 differences"
+./tools/purge-demo.sh https://demo.dashboardpack.com/kite build/web
 ```
 
 ## Docs
@@ -66,7 +70,7 @@ visitors keep getting the old one — this has bitten the downloads bucket
 before.
 
 ```bash
-ssh hetzner sudo cf-purge-url https://demo.dashboardpack.com/kite/
+./tools/purge-demo.sh https://demo.dashboardpack.com/kite build/web
 ssh hetzner sudo cf-purge-url https://docs.dashboardpack.com/kite-docs/
 ```
 
@@ -86,3 +90,12 @@ docs site needs.
 
 If that ever needs revisiting, verify with
 `node infra/workers/demo-canonical/verify-live.mjs` from divilab-content-hub.
+
+## Release artifacts and rollback
+
+See [RELEASING.md](RELEASING.md) for the full validation and GitHub release
+sequence. The downloadable web demo uses `/kite/` as its base path and mock data;
+it is not a production Auth deployment. Rebuild for a different hosting path.
+Back up the docs prefix as well as the demo before syncing. To roll back, dry-run
+and restore the corresponding backup, then purge the same URLs and verify the
+public dashboard and docs in a fresh browser session.

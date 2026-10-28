@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/data/data_provider.dart';
-import '../../core/data/mock_data_provider.dart';
+import '../../core/data/data_source.dart';
 import '../../shared/widgets/states.dart';
 
 final _recentProvider = FutureProvider<ListResult>((Ref ref) async {

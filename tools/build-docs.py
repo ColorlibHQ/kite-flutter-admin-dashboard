@@ -62,6 +62,8 @@ NAV: list[tuple[str, list[tuple[str, str, str, str]]]] = [
          "Every screen Kite ships, what each is for, and which are load-bearing."),
     ]),
     ("Build on it", [
+        ("auth", "Authentication & roles", "Authentication and roles",
+         "Supabase Auth, secure sessions, recovery, and server-enforced role policies."),
         ("data", "Data layer", "Data layer",
          "The DataProvider contract, the three adapters, and how to point Kite at your own backend."),
         ("resources", "Adding a resource", "Adding a resource",

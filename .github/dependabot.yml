@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /tools/policy-tests
+    schedule:
+      interval: weekly
+    groups:
+      policy-tests:
+        patterns: ['*']
+  - package-ecosystem: pub
+    directories:
+      - /
+      - /packages/kite_ui
+      - /packages/kite_ui/example
+    schedule:
+      interval: weekly
+    groups:
+      dart-dependencies:
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

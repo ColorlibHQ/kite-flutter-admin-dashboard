@@ -59,17 +59,30 @@ Text(l.pageOf(page, pages));   // placeholders are typed</code></pre>
 
 <h2>Coverage</h2>
 <p>
-  Honestly stated: navigation, shell chrome, settings and the auth strings are
-  localised. Screen bodies still hold English literals — the infrastructure and
-  the pattern are in place, and extraction from here is mechanical rather than
-  design work.
+  The five locale catalogs contain 154 messages, including authentication,
+  settings, role labels, resource fields, statuses, pagination, validation, and
+  CRUD feedback. Sample dashboard and app content still contains English.
+  CI checks complete keys and matching placeholders with
+  <code>python3 tools/check-l10n.py</code>.
 </p>
 
 <h2>Formatting</h2>
 <p>
   <code>KiteFormat</code> wraps <code>intl</code> for money and counts. It
-  currently pins a symbol; for a multi-currency app, pass the locale through
-  and let <code>NumberFormat.currency</code> resolve it.
+  supports explicit locale and currency parameters. Translating display labels
+  does not change resource keys or status values sent to the backend.
 </p>
-<pre><code>KiteFormat.money(1264.55)   // $1,264.55
-KiteFormat.count(3412)      // 3,412</code></pre>
+<pre><code>KiteFormat.money(1264.55)                       // $1,264.55
+KiteFormat.money(1264.55, locale: 'fr', currency: 'EUR')
+KiteFormat.count(3412, locale: 'ja')</code></pre>
+
+<h2>Accessibility checks</h2>
+<p>
+  <code>test/accessibility_test.dart</code> checks sign-in labels, target sizes,
+  contrast, keyboard submission and error announcements, all action variants
+  across six theme combinations, plus auth and settings
+  layout at 200% text size in all five locales. UI-package tests also check input
+  values and placeholders are vertically centered at normal and large text sizes
+  in both text directions. Include screen-reader testing on
+  your target devices before release; these automated checks are not a full audit.
+</p>

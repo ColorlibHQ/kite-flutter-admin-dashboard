@@ -20,6 +20,7 @@ import '../../features/system/profile_screen.dart';
 import '../../features/system/settings_screen.dart';
 import '../../shared/layout/app_shell.dart';
 import '../auth/session.dart';
+import 'auth_redirect.dart';
 import 'routes.dart';
 
 /// Bridges Riverpod state into go_router's `refreshListenable`, so signing in
@@ -33,20 +34,27 @@ class _SessionRefresh extends ChangeNotifier {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = _SessionRefresh(ref);
-  ref.onDispose(refresh.dispose);
-
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: R.dashboard,
     refreshListenable: refresh,
-    redirect: (context, state) {
-      final signedIn = ref.read(sessionProvider) != null;
-      final onAuth = R.isAuthRoute(state.matchedLocation);
-      if (!signedIn && !onAuth) return R.signIn;
-      if (signedIn && onAuth) return R.dashboard;
-      return null;
-    },
+    redirect: (context, state) => authRedirect(
+      signedIn: ref.read(sessionProvider) != null,
+      location: state.uri,
+      role: ref.read(sessionProvider)?.role,
+      needsPasswordReset:
+          ref.read(sessionProvider)?.needsPasswordReset ?? false,
+    ),
     errorBuilder: (context, state) => NotFoundScreen(location: state.uri.path),
     routes: [
+      GoRoute(
+        path: R.resetPassword,
+        builder: (_, _) => const ResetPasswordScreen(),
+      ),
+      GoRoute(
+        path: R.authCallback,
+        builder: (_, _) => const AuthCallbackScreen(),
+      ),
+      GoRoute(path: R.forbidden, builder: (_, _) => const ForbiddenScreen()),
       GoRoute(path: R.signIn, builder: (_, _) => const SignInScreen()),
       GoRoute(path: R.signUp, builder: (_, _) => const SignUpScreen()),
       GoRoute(path: R.forgot, builder: (_, _) => const ForgotPasswordScreen()),
@@ -116,4 +124,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+  ref.onDispose(() {
+    router.dispose();
+    refresh.dispose();
+  });
+  return router;
 });

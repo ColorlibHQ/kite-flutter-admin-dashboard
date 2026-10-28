@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../preferences/preferences_store.dart';
+
 /// The locales this template ships translations for.
 ///
 /// Arabic is here on purpose: it is the cheapest way to keep the layout honest.
@@ -25,9 +27,15 @@ enum KiteLocale {
 
 class LocaleController extends Notifier<KiteLocale> {
   @override
-  KiteLocale build() => KiteLocale.en;
+  KiteLocale build() => KiteLocale.values.firstWhere(
+    (l) => l.name == ref.read(preferencesStoreProvider).read('locale'),
+    orElse: () => KiteLocale.en,
+  );
 
-  void set(KiteLocale value) => state = value;
+  void set(KiteLocale value) {
+    state = value;
+    ref.read(preferencesStoreProvider).set('locale', value.name);
+  }
 }
 
 final localeProvider = NotifierProvider<LocaleController, KiteLocale>(

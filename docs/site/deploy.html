@@ -31,6 +31,7 @@
     <a href="structure.html">Project structure</a>
     <a href="screens.html">Screens</a>
     <h4>Build on it</h4>
+    <a href="auth.html">Authentication & roles</a>
     <a href="data.html">Data layer</a>
     <a href="resources.html">Adding a resource</a>
     <a href="routing.html">Routing</a>
@@ -135,7 +136,7 @@ node tools/measure-bundle.mjs build/web "label" throttle</code></pre>
 rclone sync build/web/ r2pro:dashboardpack-demos/kite/
 rclone check build/web/ r2pro:dashboardpack-demos/kite/    # expect "0 differences"
 
-ssh hetzner sudo cf-purge-url https://demo.dashboardpack.com/kite/</code></pre>
+./tools/purge-demo.sh https://demo.dashboardpack.com/kite build/web</code></pre>
 <p>
   Cloudflare caches per colo, so replacing a file without purging means visitors
   keep the old one. See <code>docs/DEPLOY.md</code> in the repo for the docs
@@ -154,22 +155,26 @@ ssh hetzner sudo cf-purge-url https://demo.dashboardpack.com/kite/</code></pre>
   <code>app_shell.dart</code>. Nothing else depends on it.
 </p>
 
-<h2>CI</h2>
-<p>Every push runs eleven jobs:</p>
+<h2>CI and releases</h2>
 <table>
   <thead><tr><th>Job</th><th>Checks</th></tr></thead>
   <tbody>
-    <tr><td><code>analyze</code></td><td><code>dart format --set-exit-if-changed .</code> then <code>flutter analyze --fatal-infos</code></td></tr>
-    <tr><td><code>test</code></td><td>26 tests with coverage</td></tr>
-    <tr><td><code>architecture</code></td><td>No <code>shadcn_ui</code> import outside <code>packages/kite_ui/</code></td></tr>
-    <tr><td><code>fonts</code></td><td>Exactly one Lucide family survives the build</td></tr>
-    <tr><td><code>build</code> ×6</td><td>web-wasm, web-js, iOS, Android, macOS, Windows</td></tr>
-    <tr><td><code>size</code></td><td>App payload under budget</td></tr>
+    <tr><td><code>analyze</code></td><td>Lockfile, locale parity, generated strings, formatting, static analysis</td></tr>
+    <tr><td><code>test</code></td><td>Application tests with coverage, including Auth, preferences and accessibility</td></tr>
+    <tr><td><code>ui-package</code></td><td>Independent package/example analysis and widget tests</td></tr>
+    <tr><td><code>docs</code></td><td>Generated documentation matches its sources</td></tr>
+    <tr><td><code>auth-e2e</code></td><td>Real local Supabase Auth, Mailpit and role flows</td></tr>
+    <tr><td><code>role-policies</code></td><td>PostgreSQL authorization and revocation tests</td></tr>
+    <tr><td><code>architecture</code></td><td>Design-library imports stay inside <code>packages/kite_ui/</code></td></tr>
+    <tr><td><code>fonts</code></td><td>Exactly one Lucide family survives</td></tr>
+    <tr><td><code>build</code></td><td>Seven variants: web Wasm, production Auth, JavaScript, Android, iOS, macOS, Windows</td></tr>
+    <tr><td><code>size</code></td><td>Demo and production Auth payloads stay within the gzip budget</td></tr>
   </tbody>
 </table>
-<p>
-  A weekly scheduled run catches Flutter SDK drift before a user reports it.
-</p>
+<p>CI runs on main-branch pushes, pull requests, and a weekly schedule. See the
+<a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/blob/main/CHANGELOG.md">changelog</a>
+and <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/blob/main/docs/RELEASING.md">release guide</a>
+for versioning, artifacts, deployment verification, and rollback.</p>
     <nav class="pager"><a class="prev" href="platforms.html"><span>Previous</span>Platforms</a><a class="next" href="faq.html"><span>Next</span>FAQ</a></nav>
   </main>
 </div>

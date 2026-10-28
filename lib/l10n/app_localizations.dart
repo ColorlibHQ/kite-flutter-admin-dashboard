@@ -396,6 +396,636 @@ abstract class L {
   /// In en, this message translates to:
   /// **'{first}–{last} of {total}'**
   String rangeOfTotal(int first, int last, int total);
+
+  /// No description provided for @authProductionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your team account.'**
+  String get authProductionSubtitle;
+
+  /// No description provided for @authDemoNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode: no email is sent and no password is verified.'**
+  String get authDemoNotice;
+
+  /// No description provided for @authSigningIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get authSigningIn;
+
+  /// No description provided for @authInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get authInvalidEmail;
+
+  /// No description provided for @authPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password.'**
+  String get authPasswordRequired;
+
+  /// No description provided for @authCreateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get authCreateAccount;
+
+  /// No description provided for @authCreateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your team account. An administrator assigns access.'**
+  String get authCreateSubtitle;
+
+  /// No description provided for @authFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get authFullName;
+
+  /// No description provided for @authPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 12 characters.'**
+  String get authPasswordHint;
+
+  /// No description provided for @authAlreadyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get authAlreadyAccount;
+
+  /// No description provided for @authBackToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign in'**
+  String get authBackToSignIn;
+
+  /// No description provided for @authResetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get authResetTitle;
+
+  /// No description provided for @authResetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request a link to reset your password.'**
+  String get authResetSubtitle;
+
+  /// No description provided for @authResetSent.
+  ///
+  /// In en, this message translates to:
+  /// **'If this account exists, a reset link will arrive shortly.'**
+  String get authResetSent;
+
+  /// No description provided for @authSendReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get authSendReset;
+
+  /// No description provided for @authVerifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email'**
+  String get authVerifyTitle;
+
+  /// No description provided for @authVerifySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the email link or enter your verification code.'**
+  String get authVerifySubtitle;
+
+  /// No description provided for @authVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get authVerificationCode;
+
+  /// No description provided for @authVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get authVerify;
+
+  /// No description provided for @authResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authResend;
+
+  /// No description provided for @authCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email for the verification message.'**
+  String get authCodeSent;
+
+  /// No description provided for @authDemoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo verification code: 123456'**
+  String get authDemoCode;
+
+  /// No description provided for @authUpdatePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Update password'**
+  String get authUpdatePassword;
+
+  /// No description provided for @authNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get authNewPassword;
+
+  /// No description provided for @authConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get authConfirmPassword;
+
+  /// No description provided for @authPasswordsMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authPasswordsMismatch;
+
+  /// No description provided for @authLockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen locked'**
+  String get authLockTitle;
+
+  /// No description provided for @authUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get authUnlock;
+
+  /// No description provided for @authOtherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in as someone else'**
+  String get authOtherAccount;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'The credentials or verification code are invalid.'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authUnconfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email before signing in.'**
+  String get authUnconfirmed;
+
+  /// No description provided for @authWeakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a stronger password with at least 12 characters.'**
+  String get authWeakPassword;
+
+  /// No description provided for @authRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Wait a moment and try again.'**
+  String get authRateLimited;
+
+  /// No description provided for @authConnectionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect. Check your connection and try again.'**
+  String get authConnectionError;
+
+  /// No description provided for @authUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication is unavailable. Please try again.'**
+  String get authUnavailable;
+
+  /// No description provided for @authCallbackFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'This link could not be verified. Request a new link or sign in.'**
+  String get authCallbackFailed;
+
+  /// No description provided for @working.
+  ///
+  /// In en, this message translates to:
+  /// **'Working…'**
+  String get working;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get loading;
+
+  /// No description provided for @accessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Access denied'**
+  String get accessDenied;
+
+  /// No description provided for @accessDeniedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account does not have permission for this action. Ask an administrator for access.'**
+  String get accessDeniedMessage;
+
+  /// No description provided for @roleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No access'**
+  String get roleNone;
+
+  /// No description provided for @roleViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get roleViewer;
+
+  /// No description provided for @roleEditor.
+  ///
+  /// In en, this message translates to:
+  /// **'Editor'**
+  String get roleEditor;
+
+  /// No description provided for @roleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrator'**
+  String get roleAdmin;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get role;
+
+  /// No description provided for @dataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data source'**
+  String get dataSource;
+
+  /// No description provided for @dataSourceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource lists, search, and edits use your configured data source. Demo changes reset on restart.'**
+  String get dataSourceHelp;
+
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemMode;
+
+  /// No description provided for @light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// No description provided for @dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// No description provided for @accentSlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Slate'**
+  String get accentSlate;
+
+  /// No description provided for @accentBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get accentBlue;
+
+  /// No description provided for @accentViolet.
+  ///
+  /// In en, this message translates to:
+  /// **'Violet'**
+  String get accentViolet;
+
+  /// No description provided for @languageHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Language, theme, and accent are saved on this device. Arabic uses a right-to-left layout.'**
+  String get languageHelp;
+
+  /// No description provided for @preferenceSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences could not be saved. Try again.'**
+  String get preferenceSaveFailed;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// No description provided for @chooseOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one'**
+  String get chooseOne;
+
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// No description provided for @numbersOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number.'**
+  String get numbersOnly;
+
+  /// No description provided for @couldNotSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save'**
+  String get couldNotSave;
+
+  /// No description provided for @refreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshed'**
+  String get refreshed;
+
+  /// No description provided for @openRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Open record'**
+  String get openRecord;
+
+  /// No description provided for @openNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Open navigation'**
+  String get openNavigation;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @accountMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Account menu'**
+  String get accountMenu;
+
+  /// No description provided for @order.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get order;
+
+  /// No description provided for @customer.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get customer;
+
+  /// No description provided for @product.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get product;
+
+  /// No description provided for @fieldStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get fieldStatus;
+
+  /// No description provided for @fieldItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get fieldItems;
+
+  /// No description provided for @fieldTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get fieldTotal;
+
+  /// No description provided for @fieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get fieldDate;
+
+  /// No description provided for @fieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get fieldNotes;
+
+  /// No description provided for @fieldSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime spend'**
+  String get fieldSpend;
+
+  /// No description provided for @fieldSku.
+  ///
+  /// In en, this message translates to:
+  /// **'SKU'**
+  String get fieldSku;
+
+  /// No description provided for @fieldPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get fieldPrice;
+
+  /// No description provided for @fieldStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get fieldStock;
+
+  /// No description provided for @statusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get statusPaid;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// No description provided for @statusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get statusRefunded;
+
+  /// No description provided for @statusShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipped'**
+  String get statusShipped;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get statusActive;
+
+  /// No description provided for @statusChurned.
+  ///
+  /// In en, this message translates to:
+  /// **'Churned'**
+  String get statusChurned;
+
+  /// No description provided for @statusInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock'**
+  String get statusInStock;
+
+  /// No description provided for @statusLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get statusLow;
+
+  /// No description provided for @statusOutOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of stock'**
+  String get statusOutOfStock;
+
+  /// No description provided for @newResource.
+  ///
+  /// In en, this message translates to:
+  /// **'New {resource}'**
+  String newResource(String resource);
+
+  /// No description provided for @editRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {record}'**
+  String editRecord(String record);
+
+  /// No description provided for @deleteRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {record}?'**
+  String deleteRecord(String record);
+
+  /// No description provided for @deleteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently removes the record.'**
+  String get deleteWarning;
+
+  /// No description provided for @recordDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{record} deleted'**
+  String recordDeleted(String record);
+
+  /// No description provided for @recordCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'{record} created'**
+  String recordCreated(String record);
+
+  /// No description provided for @recordSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{record} saved'**
+  String recordSaved(String record);
+
+  /// No description provided for @searchResource.
+  ///
+  /// In en, this message translates to:
+  /// **'Search {resource}…'**
+  String searchResource(String resource);
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'{field} is required.'**
+  String requiredField(String field);
+
+  /// No description provided for @chooseField.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose {field}.'**
+  String chooseField(String field);
+
+  /// No description provided for @fieldsNeedAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {One field needs attention} other {{count} fields need attention}}'**
+  String fieldsNeedAttention(int count);
+
+  /// No description provided for @authDemoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo account'**
+  String get authDemoAccount;
+
+  /// No description provided for @authDemoCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Email: {email}\nPassword: {password}'**
+  String authDemoCredentials(String email, String password);
+
+  /// No description provided for @authDemoHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this prefilled account to explore. No registration needed; demo data resets on restart.'**
+  String get authDemoHelp;
+
+  /// No description provided for @authPreviewHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Want to explore the template without an account?'**
+  String get authPreviewHelp;
+
+  /// No description provided for @authOpenDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Try the public demo'**
+  String get authOpenDemo;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

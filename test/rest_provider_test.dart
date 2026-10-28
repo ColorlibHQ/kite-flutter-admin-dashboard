@@ -8,6 +8,36 @@ import 'package:kite/core/data/rest_data_provider.dart';
 import 'package:kite/core/data/supabase_data_provider.dart';
 
 void main() {
+  for (final supabase in [false, true]) {
+    test(
+      '${supabase ? 'Supabase' : 'REST'} reads fresh authorization on every request',
+      () async {
+        var token = 'before-refresh';
+        final seen = <String?>[];
+        final client = MockClient((request) async {
+          seen.add(request.headers['Authorization']);
+          return http.Response('[]', 200);
+        });
+        final DataProvider provider = supabase
+            ? SupabaseDataProvider(
+                url: 'https://example.supabase.co',
+                anonKey: 'public',
+                accessTokenProvider: () => token,
+                client: client,
+              )
+            : RestDataProvider(
+                baseUrl: 'https://api.example.com',
+                headersProvider: () => {'Authorization': 'Bearer $token'},
+                client: client,
+              );
+        await provider.getList('products', const ListParams());
+        token = 'after-refresh';
+        await provider.getList('products', const ListParams());
+        expect(seen, ['Bearer before-refresh', 'Bearer after-refresh']);
+        client.close();
+      },
+    );
+  }
   group('RestDataProvider', () {
     test(
       'sends paging, sort, search and filters as query parameters',

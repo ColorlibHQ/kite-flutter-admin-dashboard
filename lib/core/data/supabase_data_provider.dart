@@ -20,6 +20,7 @@ class SupabaseDataProvider implements DataProvider {
     required this.url,
     required this.anonKey,
     this.accessToken,
+    this.accessTokenProvider,
     http.Client? client,
   }) : _client = client ?? http.Client();
 
@@ -30,6 +31,7 @@ class SupabaseDataProvider implements DataProvider {
   /// A signed-in user's JWT, when you have one. Falls back to the anon key,
   /// which means row-level security decides what comes back.
   final String? accessToken;
+  final String? Function()? accessTokenProvider;
 
   final http.Client _client;
 
@@ -47,7 +49,8 @@ class SupabaseDataProvider implements DataProvider {
 
   Map<String, String> _headers({String? prefer}) => {
     'apikey': anonKey,
-    'Authorization': 'Bearer ${accessToken ?? anonKey}',
+    'Authorization':
+        'Bearer ${accessTokenProvider?.call() ?? accessToken ?? anonKey}',
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Prefer': ?prefer,

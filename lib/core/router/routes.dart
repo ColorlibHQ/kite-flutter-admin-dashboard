@@ -6,6 +6,9 @@ import '../../l10n/app_localizations.dart';
 /// call agree. Typed constants rather than string literals scattered around.
 abstract final class R {
   static const signIn = '/sign-in';
+  static const resetPassword = '/reset-password';
+  static const authCallback = '/auth/callback';
+  static const forbidden = '/403';
   static const signUp = '/sign-up';
   static const forgot = '/forgot-password';
   static const otp = '/verify';
@@ -27,12 +30,15 @@ abstract final class R {
   static const settings = '/settings';
   static const profile = '/profile';
 
-  static bool isAuthRoute(String location) =>
-      location.startsWith(signIn) ||
-      location.startsWith(signUp) ||
-      location.startsWith(forgot) ||
-      location.startsWith(otp) ||
-      location.startsWith(lock);
+  static bool isAuthRoute(String location) => const {
+    signIn,
+    signUp,
+    forgot,
+    otp,
+    lock,
+    resetPassword,
+    authCallback,
+  }.contains(location);
 }
 
 @immutable

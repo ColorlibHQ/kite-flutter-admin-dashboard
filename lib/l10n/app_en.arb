@@ -71,5 +71,190 @@
         "type": "int"
       }
     }
+  },
+  "authProductionSubtitle": "Sign in with your team account.",
+  "authDemoNotice": "Demo mode: no email is sent and no password is verified.",
+  "authSigningIn": "Signing in…",
+  "authInvalidEmail": "Enter a valid email address.",
+  "authPasswordRequired": "Enter your password.",
+  "authCreateAccount": "Create account",
+  "authCreateSubtitle": "Create your team account. An administrator assigns access.",
+  "authFullName": "Full name",
+  "authPasswordHint": "Use at least 12 characters.",
+  "authAlreadyAccount": "Already have an account? Sign in",
+  "authBackToSignIn": "Back to sign in",
+  "authResetTitle": "Reset password",
+  "authResetSubtitle": "Request a link to reset your password.",
+  "authResetSent": "If this account exists, a reset link will arrive shortly.",
+  "authSendReset": "Send reset link",
+  "authVerifyTitle": "Verify your email",
+  "authVerifySubtitle": "Follow the email link or enter your verification code.",
+  "authVerificationCode": "Verification code",
+  "authVerify": "Verify",
+  "authResend": "Resend code",
+  "authCodeSent": "Check your email for the verification message.",
+  "authDemoCode": "Demo verification code: 123456",
+  "authUpdatePassword": "Update password",
+  "authNewPassword": "New password",
+  "authConfirmPassword": "Confirm password",
+  "authPasswordsMismatch": "Passwords do not match.",
+  "authLockTitle": "Screen locked",
+  "authUnlock": "Unlock",
+  "authOtherAccount": "Sign in as someone else",
+  "authInvalidCredentials": "The credentials or verification code are invalid.",
+  "authUnconfirmed": "Confirm your email before signing in.",
+  "authWeakPassword": "Choose a stronger password with at least 12 characters.",
+  "authRateLimited": "Too many attempts. Wait a moment and try again.",
+  "authConnectionError": "Could not connect. Check your connection and try again.",
+  "authUnavailable": "Authentication is unavailable. Please try again.",
+  "authCallbackFailed": "This link could not be verified. Request a new link or sign in.",
+  "working": "Working…",
+  "loading": "Loading",
+  "accessDenied": "Access denied",
+  "accessDeniedMessage": "Your account does not have permission for this action. Ask an administrator for access.",
+  "roleNone": "No access",
+  "roleViewer": "Viewer",
+  "roleEditor": "Editor",
+  "roleAdmin": "Administrator",
+  "appearance": "Appearance",
+  "account": "Account",
+  "role": "Role",
+  "dataSource": "Data source",
+  "dataSourceHelp": "Resource lists, search, and edits use your configured data source. Demo changes reset on restart.",
+  "systemMode": "System",
+  "light": "Light",
+  "dark": "Dark",
+  "accentSlate": "Slate",
+  "accentBlue": "Blue",
+  "accentViolet": "Violet",
+  "languageHelp": "Language, theme, and accent are saved on this device. Arabic uses a right-to-left layout.",
+  "preferenceSaveFailed": "Preferences could not be saved. Try again.",
+  "details": "Details",
+  "chooseOne": "Choose one",
+  "optional": "Optional",
+  "numbersOnly": "Enter a valid number.",
+  "couldNotSave": "Could not save",
+  "refreshed": "Refreshed",
+  "openRecord": "Open record",
+  "openNavigation": "Open navigation",
+  "notifications": "Notifications",
+  "accountMenu": "Account menu",
+  "order": "Order",
+  "customer": "Customer",
+  "product": "Product",
+  "fieldStatus": "Status",
+  "fieldItems": "Items",
+  "fieldTotal": "Total",
+  "fieldDate": "Date",
+  "fieldNotes": "Notes",
+  "fieldSpend": "Lifetime spend",
+  "fieldSku": "SKU",
+  "fieldPrice": "Price",
+  "fieldStock": "Stock",
+  "statusPaid": "Paid",
+  "statusPending": "Pending",
+  "statusRefunded": "Refunded",
+  "statusShipped": "Shipped",
+  "statusCancelled": "Cancelled",
+  "statusActive": "Active",
+  "statusChurned": "Churned",
+  "statusInStock": "In stock",
+  "statusLow": "Low",
+  "statusOutOfStock": "Out of stock",
+  "newResource": "New {resource}",
+  "@newResource": {
+    "placeholders": {
+      "resource": {
+        "type": "String"
+      }
+    }
+  },
+  "editRecord": "Edit {record}",
+  "@editRecord": {
+    "placeholders": {
+      "record": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteRecord": "Delete {record}?",
+  "@deleteRecord": {
+    "placeholders": {
+      "record": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWarning": "This permanently removes the record.",
+  "recordDeleted": "{record} deleted",
+  "@recordDeleted": {
+    "placeholders": {
+      "record": {
+        "type": "String"
+      }
+    }
+  },
+  "recordCreated": "{record} created",
+  "@recordCreated": {
+    "placeholders": {
+      "record": {
+        "type": "String"
+      }
+    }
+  },
+  "recordSaved": "{record} saved",
+  "@recordSaved": {
+    "placeholders": {
+      "record": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResource": "Search {resource}…",
+  "@searchResource": {
+    "placeholders": {
+      "resource": {
+        "type": "String"
+      }
+    }
+  },
+  "requiredField": "{field} is required.",
+  "@requiredField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseField": "Choose {field}.",
+  "@chooseField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldsNeedAttention": "{count, plural, one {One field needs attention} other {{count} fields need attention}}",
+  "@fieldsNeedAttention": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authDemoAccount": "Demo account",
+  "authDemoCredentials": "Email: {email}\nPassword: {password}",
+  "authDemoHelp": "Use this prefilled account to explore. No registration needed; demo data resets on restart.",
+  "authPreviewHelp": "Want to explore the template without an account?",
+  "authOpenDemo": "Try the public demo",
+  "@authDemoCredentials": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "password": {
+        "type": "String"
+      }
+    }
   }
 }

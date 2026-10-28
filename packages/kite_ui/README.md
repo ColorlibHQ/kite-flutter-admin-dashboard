@@ -2,7 +2,7 @@
 
 Dashboard widgets for Flutter admin panels — the UI layer extracted from the
 [Kite admin dashboard template](https://github.com/ColorlibHQ/kite-flutter-admin-dashboard),
-where it is in use across 22 screens.
+where it powers the dashboards, resource screens, and app examples.
 
 Built on [shadcn_ui](https://pub.dev/packages/shadcn_ui). The point of the
 layer is that your screens never name it: swapping the design library is a
@@ -15,8 +15,16 @@ change inside this package, not a rewrite of your app.
 
 ```yaml
 dependencies:
-  kite_ui: ^0.1.0
+  kite_ui:
+    git:
+      url: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard.git
+      ref: v0.2.0
+      path: packages/kite_ui
 ```
+
+The template itself uses a local path dependency so its widgets remain editable.
+This release distributes the package source through GitHub; it is not published
+to pub.dev.
 
 Wrap your app in a `ShadApp` (re-exported, so you do not need shadcn_ui in your
 own pubspec):

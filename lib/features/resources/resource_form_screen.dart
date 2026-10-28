@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kite_ui/kite_ui.dart';
 
+import '../../core/data/authorized_data_provider.dart';
 import '../../core/data/data_provider.dart';
-import '../../core/data/mock_data_provider.dart';
+import '../../core/data/data_source.dart';
+import '../../core/l10n/labels.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/states.dart';
 import 'resource_detail_screen.dart';
 import 'resource_providers.dart';
@@ -86,15 +89,19 @@ class _FormState extends ConsumerState<_Form> {
     switch (f.kind) {
       case ColKind.select:
         if (_selects[f.field] == null) {
-          return 'Choose a ${f.title.toLowerCase()}.';
+          return L.of(context).chooseField(fieldLabel(L.of(context), f.title));
         }
       case ColKind.email:
-        if (!raw.contains('@')) return 'Enter an address with an @ in it.';
+        if (!raw.contains('@')) return L.of(context).authInvalidEmail;
       case ColKind.number:
       case ColKind.money:
-        if (num.tryParse(raw) == null) return 'Numbers only.';
+        if (num.tryParse(raw) == null) return L.of(context).numbersOnly;
       case ColKind.text:
-        if (raw.isEmpty) return '${f.title} cannot be empty.';
+        if (raw.isEmpty) {
+          return L
+              .of(context)
+              .requiredField(fieldLabel(L.of(context), f.title));
+        }
       case ColKind.longText:
         break;
     }
@@ -115,8 +122,7 @@ class _FormState extends ConsumerState<_Form> {
     if (errors.isNotEmpty) {
       KiteToast.show(
         context,
-        title:
-            '${errors.length} field${errors.length == 1 ? '' : 's'} need attention',
+        title: L.of(context).fieldsNeedAttention(errors.length),
         tone: KiteTone.danger,
       );
       return;
@@ -148,17 +154,23 @@ class _FormState extends ConsumerState<_Form> {
       KiteToast.show(
         context,
         title: widget.id == null
-            ? '${_spec.singular} created'
-            : '${_spec.singular} saved',
+            ? L
+                  .of(context)
+                  .recordCreated(fieldLabel(L.of(context), _spec.singular))
+            : L
+                  .of(context)
+                  .recordSaved(fieldLabel(L.of(context), _spec.singular)),
         tone: KiteTone.success,
       );
-    } on DataProviderException catch (e) {
+    } on Object catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
       KiteToast.show(
         context,
-        title: 'Could not save',
-        description: e.message,
+        title: L.of(context).couldNotSave,
+        description: e is PermissionDeniedException
+            ? L.of(context).accessDeniedMessage
+            : L.of(context).authConnectionError,
         tone: KiteTone.danger,
       );
     }
@@ -167,9 +179,10 @@ class _FormState extends ConsumerState<_Form> {
   @override
   Widget build(BuildContext context) {
     final t = KiteText.of(context);
+    final l = L.of(context);
     final title = widget.id == null
-        ? 'New ${_spec.singular.toLowerCase()}'
-        : 'Edit ${widget.initial[_spec.titleField]}';
+        ? l.newResource(fieldLabel(l, _spec.singular))
+        : l.editRecord('${widget.initial[_spec.titleField]}');
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(KiteSpace.xl),
@@ -189,20 +202,20 @@ class _FormState extends ConsumerState<_Form> {
                   children: [
                     for (final f in _spec.editableFields)
                       KiteField(
-                        label: f.title,
+                        label: fieldLabel(l, f.title),
                         error: _errors[f.field],
                         child: switch (f.kind) {
                           ColKind.select => KiteSelect<String>(
                             options: f.options,
-                            labelOf: (v) => v,
+                            labelOf: (v) => statusLabel(l, v),
                             value: _selects[f.field],
-                            placeholder: 'Choose one',
+                            placeholder: l.chooseOne,
                             onChanged: (v) =>
                                 setState(() => _selects[f.field] = v),
                           ),
                           ColKind.longText => KiteTextarea(
                             controller: _controllers[f.field],
-                            placeholder: 'Optional',
+                            placeholder: l.optional,
                           ),
                           ColKind.number || ColKind.money => KiteInput(
                             controller: _controllers[f.field],
@@ -224,7 +237,7 @@ class _FormState extends ConsumerState<_Form> {
                         KiteButton(
                           enabled: !_saving,
                           onPressed: _save,
-                          child: Text(_saving ? 'Saving…' : 'Save'),
+                          child: Text(_saving ? l.working : l.actionSave),
                         ),
                         const SizedBox(width: KiteSpace.md),
                         KiteButton.ghost(
@@ -233,7 +246,7 @@ class _FormState extends ConsumerState<_Form> {
                                 ? '/${widget.resource}'
                                 : '/${widget.resource}/${widget.id}',
                           ),
-                          child: const Text('Cancel'),
+                          child: Text(l.actionCancel),
                         ),
                       ],
                     ),

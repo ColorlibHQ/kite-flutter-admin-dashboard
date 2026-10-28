@@ -41,27 +41,36 @@ class ListResult {
 
 <h2>Switching backend</h2>
 <p>
-  One line, in <code>lib/core/data/mock_data_provider.dart</code>. Every screen
-  follows, including the ⌘K command palette.
+  Backend selection lives in <code>lib/core/data/data_source.dart</code>.
+  With no configuration, Kite uses seeded in-memory data. With Supabase Auth, it
+  selects Supabase data automatically. To use authenticated REST:
 </p>
-<pre><code>// The default — no backend needed
-final dataProvider = Provider&lt;DataProvider&gt;((ref) =&gt; MockDataProvider());
-
-// A conventional REST API
-final dataProvider = Provider&lt;DataProvider&gt;(
-  (ref) =&gt; RestDataProvider(
-    baseUrl: 'https://api.example.com',
-    headers: {'Authorization': 'Bearer $token'},
-  ),
-);
-
-// Supabase
-final dataProvider = Provider&lt;DataProvider&gt;(
-  (ref) =&gt; SupabaseDataProvider(
-    url: 'https://xyzcompany.supabase.co',
-    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
-  ),
+<pre><code>flutter run -d chrome --dart-define-from-file=config/production.local.json --dart-define=KITE_API_URL=https://api.example.com</code></pre>
+<p>
+  Resource CRUD, command search, and dashboard record lists use this provider.
+  Dashboard metrics and app examples still include sample data. Authentication
+  is configured through <code>AuthRepository</code>; see <a href="auth.html">Authentication</a>.
+</p>
+<p>
+  With Supabase Auth configured, no factory edit is needed: the data source
+  selects Supabase automatically and reads the current token for each request.
+  A configured REST API receives the same bearer token. Its server must verify
+  JWTs and enforce permissions independently.
+</p>
+<p>
+  For your own adapter, implement <code>DataProvider</code> and retain the
+  <code>AuthorizedDataProvider</code> wrapper in <code>data_source.dart</code>:
+</p>
+<pre><code>return AuthorizedDataProvider(
+  MyDataProvider(),
+  currentUser: () =&gt; ref.read(sessionProvider),
 );</code></pre>
+<p>
+  Build-time values are public. Never embed a service-role key. The included
+  role migration enforces permissions through RLS. For cross-origin REST APIs,
+  expose <code>X-Total-Count</code> through CORS so browser pagination can read
+  the total. See <a href="auth.html">Authentication and roles</a> for setup.
+</p>
 
 <h2>MockDataProvider</h2>
 <p>
@@ -96,10 +105,10 @@ DELETE /orders/10004</code></pre>
 
 <h2>SupabaseDataProvider</h2>
 <p>
-  Talks to PostgREST directly over <code>http</code> — deliberately <em>not</em>
-  <code>supabase_flutter</code>. Pulling a large SDK plus its auth, realtime and
-  storage into a template most people will re-point at their own backend is a
-  poor trade. If you want the SDK, this class is the seam to replace.
+  Talks to PostgREST over <code>http</code>, using the current Supabase Auth
+  token on every request. Token refresh does not leave a stale bearer token in
+  the data adapter. Role-aware route and data guards mirror server policy;
+  database RLS remains the security boundary.
 </p>
 <pre><code>// Count comes from Content-Range, requested with Prefer: count=exact
 Range: 25-49

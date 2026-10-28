@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/auth/session.dart';
+import '../../core/l10n/labels.dart';
+import '../../l10n/app_localizations.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -48,7 +50,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Text(user?.name ?? 'Admin', style: t.large),
           Text(user?.email ?? '', style: t.muted),
           const SizedBox(height: KiteSpace.sm),
-          KiteBadge(user?.role ?? 'Admin', tone: KiteTone.info),
+          KiteBadge(
+            roleLabel(L.of(context), user?.role ?? UserRole.none),
+            tone: KiteTone.info,
+          ),
           const SizedBox(height: KiteSpace.xl),
           KiteButton.outline(
             expands: true,

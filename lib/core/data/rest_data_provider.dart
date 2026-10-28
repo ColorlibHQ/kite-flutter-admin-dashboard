@@ -22,11 +22,13 @@ class RestDataProvider implements DataProvider {
   RestDataProvider({
     required this.baseUrl,
     this.headers = const {},
+    this.headersProvider,
     http.Client? client,
   }) : _client = client ?? http.Client();
 
   final String baseUrl;
   final Map<String, String> headers;
+  final Map<String, String> Function()? headersProvider;
   final http.Client _client;
 
   Uri _uri(String path, [Map<String, String>? query]) =>
@@ -37,6 +39,7 @@ class RestDataProvider implements DataProvider {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     ...headers,
+    ...?headersProvider?.call(),
   };
 
   Never _fail(http.Response r, String what) =>

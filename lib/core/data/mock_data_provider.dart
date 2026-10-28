@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'data_provider.dart';
 
 /// The most important adapter in the project.
@@ -204,22 +202,3 @@ class MockDataProvider implements DataProvider {
     _table(resource).removeWhere((r) => r['id'] == id);
   }
 }
-
-/// The one line that decides where every screen gets its data.
-///
-/// Swap it for either of the shipped adapters and nothing above this line
-/// changes:
-///
-/// ```dart
-/// final dataProvider = Provider<DataProvider>(
-///   (ref) => RestDataProvider(baseUrl: 'https://api.example.com'),
-/// );
-///
-/// final dataProvider = Provider<DataProvider>(
-///   (ref) => SupabaseDataProvider(
-///     url: 'https://xyzcompany.supabase.co',
-///     anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
-///   ),
-/// );
-/// ```
-final dataProvider = Provider<DataProvider>((ref) => MockDataProvider());

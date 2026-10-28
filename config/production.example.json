@@ -1,0 +1,5 @@
+{
+  "SUPABASE_URL": "https://YOUR_PROJECT.supabase.co",
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_REPLACE_WITH_PUBLIC_CLIENT_KEY",
+  "KITE_AUTH_REDIRECT_URL": "https://admin.example.com/auth/callback"
+}

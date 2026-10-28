@@ -5,7 +5,7 @@
 <table>
   <thead><tr><th>Tool</th><th>Version</th><th>Notes</th></tr></thead>
   <tbody>
-    <tr><td>Flutter</td><td>3.47+</td><td>Dart 3.13 comes with it</td></tr>
+    <tr><td>Flutter</td><td>3.47.8</td><td>Dart 3.13.7 comes with it; matches CI</td></tr>
     <tr><td>Xcode</td><td>16+</td><td>iOS and macOS builds only</td></tr>
     <tr><td>Android SDK</td><td>34+</td><td>Android builds only</td></tr>
   </tbody>
@@ -19,19 +19,33 @@
 <pre><code>git clone https://github.com/ColorlibHQ/kite-flutter-admin-dashboard
 cd kite-flutter-admin-dashboard
 flutter pub get
-flutter run</code></pre>
+flutter run -d chrome</code></pre>
 <p>
-  Sign in with any email — the field is prefilled and the session is in-memory,
-  so a page reload signs you out again. That is deliberate: see
+  Without backend configuration, sign in with any email. Demo identities and
+  edits reset on restart; theme, accent, and locale persist. To use verified
+  identities and real permissions, follow <a href="auth.html">Authentication</a>. See
   <a href="state.html">State</a>.
 </p>
+
+<h2>Demo login</h2>
+<p>The local sign-in screen includes a prefilled sample account:</p>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Email</td><td><code>admin@kite.dev</code></td></tr>
+<tr><td>Password</td><td><code>password</code></td></tr>
+</tbody></table>
+<p>Click <b>Sign in</b>; no registration or email verification is required. The
+hosted demo opens directly on the dashboard. Sign out to inspect its login form.
+These credentials are only for mock mode and do not access a Supabase project.</p>
+<p>Production sign-in includes a separate public-demo link. Customize it with
+<code>--dart-define=KITE_PREVIEW_URL=https://your-demo.example/</code>, or hide it
+with <code>--dart-define=KITE_PREVIEW_URL=</code>.</p>
 
 <h2>Pinning the SDK</h2>
 <p>
   Kite pins Flutter with <a href="https://fvm.app">fvm</a> so local builds match
   what CI builds. If you use it:
 </p>
-<pre><code>fvm use 3.47.1
+<pre><code>fvm install
 fvm flutter run</code></pre>
 
 <h2>First things to look at</h2>
@@ -51,7 +65,7 @@ fvm flutter run</code></pre>
 <h2>Everyday commands</h2>
 <pre><code>flutter run -d chrome          # web
 flutter run -d macos           # desktop
-flutter test                   # 26 tests
+flutter test --coverage        # behavior and adapter tests
 flutter analyze                # strict: casts, inference, raw types
 dart format .                  # CI checks the whole tree, not just lib/</code></pre>
 

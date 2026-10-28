@@ -8,7 +8,7 @@ import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/auth/session.dart';
 import '../../core/data/data_provider.dart';
-import '../../core/data/mock_data_provider.dart';
+import '../../core/data/data_source.dart';
 import '../../core/router/routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -174,18 +174,20 @@ class _CommandPaletteState extends ConsumerState<_CommandPalette> {
         onSelect: () =>
             ref.read(themeProvider.notifier).toggleBrightness(context),
       ),
-      CommandResult(
-        label: 'New order',
-        group: 'Actions',
-        icon: Icons.add,
-        onSelect: () => context.go('/orders/new'),
-      ),
-      CommandResult(
-        label: 'New product',
-        group: 'Actions',
-        icon: Icons.add,
-        onSelect: () => context.go('/products/new'),
-      ),
+      if (ref.read(sessionProvider)?.role.canWrite ?? false)
+        CommandResult(
+          label: l.newResource(l.order),
+          group: 'Actions',
+          icon: Icons.add,
+          onSelect: () => context.go('/orders/new'),
+        ),
+      if (ref.read(sessionProvider)?.role.canWrite ?? false)
+        CommandResult(
+          label: l.newResource(l.product),
+          group: 'Actions',
+          icon: Icons.add,
+          onSelect: () => context.go('/products/new'),
+        ),
       CommandResult(
         label: l.actionSignOut,
         group: 'Actions',

@@ -1,0 +1,41 @@
+<h1>Authentication and roles</h1>
+<p class="lead">Supabase Auth for verified identity. Database policies for real permissions.</p>
+<h2>Public preview and demo login</h2>
+<p>Mock mode provides <code>admin@kite.dev</code> / <code>password</code>, shown
+beside the prefilled fields. It sends no mail and never grants backend access.
+The public preview opens the dashboard immediately; sign out to view its form.
+Production fields start empty and offer a separate demo link, configured with
+<code>KITE_PREVIEW_URL</code> (an empty value hides it).</p>
+<h2>Local end-to-end tests</h2>
+<p>The repository includes a local <code>kite-e2e</code> Supabase stack with email confirmation enabled. API: <code>57421</code>; Mailpit: <code>57424</code>. No messages leave the machine.</p>
+<pre><code>node tools/local-supabase.mjs start
+node tools/configure-local-supabase.mjs
+node tools/auth-e2e.mjs</code></pre>
+<p>The live-service runner tests confirmation, password sign-in, PKCE recovery, Viewer/Editor/Admin permissions, self-escalation prevention, immediate revocation, and refresh-token invalidation. It rejects hosted endpoints and removes synthetic fixtures. CI runs it against a fresh local stack.</p>
+<h2>Production setup</h2>
+<ol>
+  <li>Apply <code>supabase/migrations/202610270001_kite_auth_roles.sql</code> to a new project.</li>
+  <li>Configure email/password Auth, SMTP, email confirmation and password policies.</li>
+  <li>Allow your exact <code>/auth/callback</code> URL and its <code>?flow=recovery</code> variant in Supabase.</li>
+  <li>Copy <code>config/production.example.json</code> to <code>config/production.local.json</code> and set the public project configuration.</li>
+  <li>Assign the initial administrator through the SQL editor. New signups receive no resource access automatically.</li>
+</ol>
+<pre><code>flutter run -d chrome --web-port 8722 --dart-define-from-file=config/production.local.json</code></pre>
+<p>Email confirmation accepts links and six- through ten-digit codes. A successful
+confirmation may open <b>Access denied</b> until a trusted operator assigns a role;
+this is the expected behavior for a new, unassigned account.</p>
+<h2>Roles</h2>
+<table><thead><tr><th>Role</th><th>Read</th><th>Create/update</th><th>Delete</th></tr></thead><tbody>
+<tr><td>Unassigned</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Viewer</td><td>Yes</td><td>No</td><td>No</td></tr>
+<tr><td>Editor</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+<tr><td>Admin</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+</tbody></table>
+<p>Roles come from <code>kite_user_roles</code>. Clients can read only their own role and cannot grant access. RLS checks current database state, so revocation takes effect on the next request even with an older JWT. UI guards improve UX; they do not replace server authorization.</p>
+<p>The included policies cover one shared workspace. Add tenant membership and row ownership policies for multiple organizations.</p>
+<h2>Session lifecycle</h2>
+<p>The SDK verifies credentials, persists sessions and refreshes tokens. Resource adapters read the latest token on each request. Startup validates restored identity and reloads roles. Native session tokens and PKCE verifiers use OS secure storage; web sessions use SDK browser storage. Display preferences are stored separately.</p>
+<p>Registration, confirmation codes and recovery use actual Supabase endpoints. Recovery uses PKCE and preserves its intent across cold starts. The unconfigured demo sends no email and displays its sample code explicitly. Do not combine demo auto-sign-in with production Auth.</p>
+<h2>Platform setup and verification</h2>
+<p>Android, iOS and macOS register the template callback <code>kite://login/auth/callback</code>. Customize it before distribution and configure the allowed redirect in Supabase. Windows needs a protocol association in the installer. Test real email delivery and signed app callbacks in staging.</p>
+<p>For the full configuration, initial role assignment SQL, platform details, storage tradeoffs and verification commands, read <a href="https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/blob/main/docs/AUTHENTICATION.md">docs/AUTHENTICATION.md</a> in the repository.</p>

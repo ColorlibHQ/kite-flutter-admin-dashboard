@@ -4,7 +4,8 @@ import 'package:kite/core/data/mock_data_provider.dart';
 
 void main() {
   // Zero latency: these assert behaviour, not timing.
-  final provider = MockDataProvider(latency: Duration.zero);
+  late MockDataProvider provider;
+  setUp(() => provider = MockDataProvider(latency: Duration.zero));
 
   group('getList', () {
     test('paginates and reports the full total, not the page length', () async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../shadcn.dart';
 import 'tokens.dart';
@@ -30,9 +31,16 @@ class KiteField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(label, style: t.small.copyWith(fontWeight: FontWeight.w500)),
+          ExcludeSemantics(
+            child: Text(
+              label,
+              style: t.small.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
           const SizedBox(height: KiteSpace.sm),
-          child,
+          MergeSemantics(
+            child: Semantics(label: label, child: child),
+          ),
           if (hint != null && error == null) ...[
             const SizedBox(height: KiteSpace.xs),
             Text(hint!, style: t.muted.copyWith(fontSize: 12)),
@@ -40,9 +48,12 @@ class KiteField extends StatelessWidget {
           if (error != null) ...[
             const SizedBox(height: KiteSpace.xs),
             // Say what went wrong and how to fix it.
-            Text(
-              error!,
-              style: t.small.copyWith(fontSize: 12, color: c.destructive),
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                error!,
+                style: t.small.copyWith(fontSize: 12, color: c.destructive),
+              ),
             ),
           ],
         ],
@@ -62,6 +73,12 @@ class KiteInput extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.onSubmitted,
+    this.autofillHints = const [],
+    this.textInputAction,
+    this.inputFormatters,
+    this.focusNode,
+    this.semanticLabel,
+    this.enabled = true,
   });
 
   final TextEditingController? controller;
@@ -72,18 +89,50 @@ class KiteInput extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final Iterable<String> autofillHints;
+  final TextInputAction? textInputAction;
+  final List<TextInputFormatter>? inputFormatters;
+  final FocusNode? focusNode;
+  final String? semanticLabel;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) => ShadInput(
-    controller: controller,
-    placeholder: placeholder == null ? null : Text(placeholder!),
-    leading: leading,
-    trailing: trailing,
-    obscureText: obscure,
-    keyboardType: keyboardType,
-    onChanged: onChanged,
-    onSubmitted: onSubmitted,
-  );
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final style = theme.textTheme.muted.merge(theme.inputTheme.style);
+    final lineHeight =
+        MediaQuery.textScalerOf(context).scale(style.fontSize ?? 14) *
+        (style.height ?? 1.5);
+    // Account for the minimum touch target with equal space above and below
+    // the text. Larger accessibility text keeps at least 8px of padding.
+    final verticalPadding = ((48 - lineHeight) / 2).clamp(8.0, double.infinity);
+    return Semantics(
+      label: semanticLabel,
+      enabled: enabled,
+      child: ShadInput(
+        controller: controller,
+        placeholder: placeholder == null ? null : Text(placeholder!),
+        leading: leading,
+        trailing: trailing,
+        obscureText: obscure,
+        keyboardType: keyboardType,
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        autofillHints: autofillHints,
+        textInputAction: textInputAction,
+        inputFormatters: inputFormatters,
+        focusNode: focusNode,
+        enabled: enabled,
+        constraints: const BoxConstraints(minHeight: 48),
+        padding: EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: verticalPadding,
+        ),
+        alignment: AlignmentDirectional.centerStart,
+        placeholderAlignment: AlignmentDirectional.centerStart,
+      ),
+    );
+  }
 }
 
 class KiteTextarea extends StatelessWidget {

@@ -65,3 +65,34 @@ shortening it.
 **The recorder clicks the sidebar by coordinate.** Adding a nav item shifts
 everything below it and the recording lands on the wrong screens. Positions and
 spacing are documented in the `NAV` constant.
+
+## Authentication, policies, and localization
+
+- `node tools/local-supabase.mjs start|status|stop`: manage the isolated local
+  `kite-e2e` stack. Requires Supabase CLI 2.122.0 and a Docker-compatible runtime.
+- `node tools/configure-local-supabase.mjs`: write ignored local Flutter config
+  with public client settings; service-role credentials never enter the app.
+- `node tools/auth-e2e.mjs`: test real confirmation, password sign-in, PKCE
+  recovery, role permissions and revocation. Loopback-only; cleans up fixtures.
+  Writes a credential-free report to `build/e2e/auth-report.json`.
+- `node tools/local-role.mjs email@example.test viewer|editor|admin|none`:
+  assign access in the local test stack only.
+- `npm ci --prefix tools/policy-tests --ignore-scripts`, then
+  `npm test --prefix tools/policy-tests`: run the migration in PostgreSQL/Wasm
+  and test authorization independently of the Auth service.
+- `python3 tools/check-l10n.py`: require complete keys and matching placeholders
+  across all five ARB catalogs. Run `flutter gen-l10n` after editing translations.
+- `python3 tools/build-docs.py`: rebuild committed `docs/site/` from `docs/src/`.
+
+See [authentication setup](../docs/AUTHENTICATION.md) for local and hosted
+configuration, SMTP, initial role assignment, callbacks, and storage tradeoffs.
+See [release guide](../docs/RELEASING.md) for validation and deployment.
+
+## Cache purging
+
+`./tools/purge-demo.sh https://demo.dashboardpack.com/kite build/web` purges the
+shell, build files, and common SPA entry points through the existing `hetzner`
+Cloudflare purge helper. `./tools/purge-docs.sh` purges every generated HTML/CSS
+page. Run these after an upload so cached bootstrap and documentation files do
+not lag behind R2. Both require the configured SSH access; no API token is
+written into this repository.

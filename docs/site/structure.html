@@ -31,6 +31,7 @@
     <a href="structure.html" class="here">Project structure</a>
     <a href="screens.html">Screens</a>
     <h4>Build on it</h4>
+    <a href="auth.html">Authentication & roles</a>
     <a href="data.html">Data layer</a>
     <a href="resources.html">Adding a resource</a>
     <a href="routing.html">Routing</a>
@@ -61,10 +62,6 @@
 <pre><code>lib/
 ├── main.dart          usePathUrlStrategy() + ProviderScope
 ├── app.dart           ShadApp.router, theme and locale wiring
-├── kite_ui/           the ONLY folder that imports the design library
-│   ├── _shadcn.dart   single import surface — the swap point
-│   ├── tokens.dart    KiteSpace, KiteRadius, KiteBreak, KiteColors, KiteText
-│   └── …              button, card, chart, data_table, menu, inputs, …
 ├── core/
 │   ├── router/        routes.dart (paths + nav) and app_router.dart
 │   ├── theme/         light + dark × 3 accents
@@ -75,12 +72,18 @@
 ├── shared/
 │   ├── layout/        AppShell — sidebar, top bar, mobile bottom bar
 │   └── widgets/       empty, loading and error states
-└── features/          one folder per screen group</code></pre>
+└── features/          one folder per screen group
+
+packages/kite_ui/
+├── lib/kite_ui.dart   public widget exports
+├── lib/shadcn.dart    design-library bridge
+├── lib/src/           widgets, charts, tables, and design tokens
+└── example/           standalone package demo</code></pre>
 
 <h2>The one rule</h2>
 <div class="note warn">
   <p>
-    <b>No <code>shadcn_ui</code> type may appear outside
+    <b>Direct <code>shadcn_ui</code> imports must stay inside
     <code>packages/kite_ui/</code>.</b>
   </p>
   <p>
@@ -115,26 +118,28 @@ fi</code></pre>
 </ol>
 <p>
   Screens inside the shell get the sidebar, top bar and auth guard for free.
-  Screens declared outside it (the five auth screens, the 500 page) render
+  Screens declared outside it (the five auth screens) render
   standalone.
 </p>
 
 <h2>Why features never import each other</h2>
 <p>
   Anything two features both need lives in <code>shared/</code> or
-  <code>kite_ui/</code>. It keeps deletion cheap — removing a feature you do not
+  <code>packages/kite_ui/</code>. It keeps deletion cheap — removing a feature you do not
   want is deleting its folder and its route, not untangling it from three
   others.
 </p>
 
 <h2>Tests</h2>
 <pre><code>test/
+├── auth_redirect_test.dart   deep-link preservation and safe return locations
+├── data_source_test.dart     backend selection and configuration validation
 ├── data_provider_test.dart   the contract: totals, search, filters, sort, mutations
 ├── rest_provider_test.dart   both HTTP adapters against a fake client
 ├── format_test.dart          money formatting
 └── session_test.dart         sign in, initials, sign out</code></pre>
 <p>
-  26 tests. They cover the parts where being wrong is silent — a
+  Tests cover the parts where being wrong is silent — a
   <code>total</code> that reports the page length instead of the row count still
   renders a table, it just paginates wrongly.
 </p>

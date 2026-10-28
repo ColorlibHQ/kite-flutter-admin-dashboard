@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kite_ui/kite_ui.dart';
 
 import '../../core/auth/session.dart';
+import '../../core/l10n/labels.dart';
 import '../../core/l10n/locale_controller.dart';
 import '../../core/router/routes.dart';
 import '../../core/theme/app_theme.dart';
@@ -225,7 +226,7 @@ class _UserTile extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  user.role,
+                  roleLabel(L.of(context), user.role),
                   style: t.muted.copyWith(fontSize: 11),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -279,6 +280,7 @@ class _TopBar extends ConsumerWidget {
           if (mobile)
             IconButton(
               icon: const Icon(Icons.menu),
+              tooltip: l.openNavigation,
               color: c.mutedForeground,
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
@@ -293,6 +295,7 @@ class _TopBar extends ConsumerWidget {
           KiteTooltip(
             message: isDark ? l.lightMode : l.darkMode,
             child: IconButton(
+              tooltip: isDark ? l.lightMode : l.darkMode,
               iconSize: 18,
               color: c.mutedForeground,
               icon: Icon(
@@ -343,7 +346,10 @@ class _SearchTrigger extends StatelessWidget {
               Icon(Icons.search, size: 15, color: c.mutedForeground),
               const SizedBox(width: KiteSpace.sm),
               Expanded(
-                child: Text('Search…', style: t.muted.copyWith(fontSize: 13)),
+                child: Text(
+                  L.of(context).actionSearch,
+                  style: t.muted.copyWith(fontSize: 13),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -417,7 +423,7 @@ class _NotificationsButton extends StatelessWidget {
         ),
       ],
       trigger: (context, open) => KiteTooltip(
-        message: 'Notifications',
+        message: L.of(context).notifications,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -425,6 +431,7 @@ class _NotificationsButton extends StatelessWidget {
               iconSize: 18,
               color: c.mutedForeground,
               icon: const Icon(Icons.notifications_none),
+              tooltip: L.of(context).notifications,
               onPressed: open,
             ),
             // Count in a badge, not just a dot — "how many" is the question.
@@ -542,22 +549,29 @@ class _AccountMenu extends ConsumerWidget {
           onPressed: () => ref.read(sessionProvider.notifier).signOut(),
         ),
       ],
-      trigger: (context, open) => InkWell(
-        borderRadius: KiteRadius.allSm,
-        onTap: open,
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              KiteAvatar(name: user?.name ?? 'Admin', size: 28),
-              const SizedBox(width: KiteSpace.xs),
-              Icon(
-                Icons.keyboard_arrow_down,
-                size: 16,
-                color: c.mutedForeground,
+      trigger: (context, open) => Semantics(
+        button: true,
+        label: l.accountMenu,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+          child: InkWell(
+            borderRadius: KiteRadius.allSm,
+            onTap: open,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  KiteAvatar(name: user?.name ?? 'Admin', size: 28),
+                  const SizedBox(width: KiteSpace.xs),
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 16,
+                    color: c.mutedForeground,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -583,7 +597,10 @@ class _BottomBar extends StatelessWidget {
       onDestinationSelected: (i) => context.go(items[i].path),
       destinations: [
         for (final n in items)
-          NavigationDestination(icon: Icon(n.icon, size: 20), label: n.label),
+          NavigationDestination(
+            icon: Icon(n.icon, size: 20),
+            label: n.labelOf(L.of(context)),
+          ),
       ],
     );
   }

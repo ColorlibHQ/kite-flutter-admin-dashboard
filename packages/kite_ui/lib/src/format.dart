@@ -5,22 +5,37 @@ import 'package:intl/intl.dart';
 /// Money is always two decimals with a thousands separator — `$699.0` in a
 /// table of currency reads as a bug, because it is one.
 abstract final class KiteFormat {
-  static final _money = NumberFormat.currency(symbol: r'$', decimalDigits: 2);
-  static final _compactMoney = NumberFormat.compactCurrency(symbol: r'$');
-  static final _int = NumberFormat.decimalPattern();
-
-  static String money(Object? value) {
+  static String money(
+    Object? value, {
+    String? locale,
+    String currency = 'USD',
+  }) {
     final n = value is num ? value : num.tryParse('$value');
-    return n == null ? '—' : _money.format(n);
+    return n == null
+        ? '—'
+        : NumberFormat.simpleCurrency(
+            locale: locale,
+            name: currency,
+            decimalDigits: 2,
+          ).format(n);
   }
 
-  static String compactMoney(Object? value) {
+  static String compactMoney(
+    Object? value, {
+    String? locale,
+    String currency = 'USD',
+  }) {
     final n = value is num ? value : num.tryParse('$value');
-    return n == null ? '—' : _compactMoney.format(n);
+    return n == null
+        ? '—'
+        : NumberFormat.compactCurrency(
+            locale: locale,
+            name: currency,
+          ).format(n);
   }
 
-  static String count(Object? value) {
+  static String count(Object? value, {String? locale}) {
     final n = value is num ? value : num.tryParse('$value');
-    return n == null ? '—' : _int.format(n);
+    return n == null ? '—' : NumberFormat.decimalPattern(locale).format(n);
   }
 }

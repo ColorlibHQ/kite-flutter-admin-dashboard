@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:kite_ui/kite_ui.dart';
 
@@ -47,7 +48,7 @@ class AuthScaffold extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(title, style: t.h3),
+                      Semantics(header: true, child: Text(title, style: t.h3)),
                       const SizedBox(height: KiteSpace.xs),
                       Text(subtitle, style: t.muted),
                       const SizedBox(height: KiteSpace.xl),
@@ -87,6 +88,9 @@ class AuthField extends StatelessWidget {
     this.keyboardType,
     this.onSubmitted,
     this.error,
+    this.autofillHints = const [],
+    this.inputFormatters,
+    this.enabled = true,
   });
 
   final String label;
@@ -96,6 +100,9 @@ class AuthField extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onSubmitted;
   final String? error;
+  final Iterable<String> autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) => KiteField(
@@ -107,6 +114,12 @@ class AuthField extends StatelessWidget {
       obscure: obscure,
       keyboardType: keyboardType,
       onSubmitted: onSubmitted,
+      autofillHints: autofillHints,
+      inputFormatters: inputFormatters,
+      textInputAction: onSubmitted == null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      enabled: enabled,
     ),
   );
 }

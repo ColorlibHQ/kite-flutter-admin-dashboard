@@ -8,31 +8,85 @@ on:
     # Weekly — catches Flutter SDK drift before a user reports it.
     - cron: '0 6 * * 1'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  FLUTTER_VERSION: '3.47.1'
+  FLUTTER_VERSION: '3.47.8'
   # App payload only — skwasm.wasm (~1.2 MB) comes from gstatic and is shared
-  # across every Flutter web app, so it is excluded. Measured 2026-08-27 with
-  # both font tools applied: 1562 KB. Budget is measured + ~12% headroom.
+  # across every Flutter web app, so it is excluded. Measured 2026-10-27:
+  # demo 1637 KB, production Auth 1673 KB, with both font tools applied.
   WASM_GZIP_BUDGET_KB: 1750
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get --enforce-lockfile
+      - run: python3 tools/check-l10n.py
+      - run: flutter gen-l10n
+      - run: git diff --exit-code -- lib/l10n
+      - run: dart format --set-exit-if-changed .
+      - run: flutter analyze --fatal-infos
+
+  ui-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
       - run: flutter pub get
-      - run: dart format --set-exit-if-changed .
+        working-directory: packages/kite_ui
+      - run: flutter pub get
+        working-directory: packages/kite_ui/example
       - run: flutter analyze --fatal-infos
+        working-directory: packages/kite_ui
+      - run: flutter test --coverage
+        working-directory: packages/kite_ui
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: python3 tools/build-docs.py
+      - run: git diff --exit-code -- docs/site
+
+  auth-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: supabase/setup-cli@v3.0.1
+        with:
+          version: 2.122.0
+      - run: node tools/local-supabase.mjs start
+      - run: node tools/auth-e2e.mjs
+      - if: always()
+        run: node tools/local-supabase.mjs stop
+
+  role-policies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: npm ci --prefix tools/policy-tests --ignore-scripts
+      - run: npm test --prefix tools/policy-tests
 
   architecture:
     # The one rule that matters: features never import the design library directly.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
       - name: No shadcn_ui imports outside packages/kite_ui/
         run: |
           # The app reaches shadcn only through package:kite_ui/shadcn.dart.
@@ -46,12 +100,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
-      - run: flutter pub get
+      - run: flutter pub get --enforce-lockfile
       - run: flutter test --coverage
 
   build:
@@ -62,6 +116,9 @@ jobs:
           - target: web-wasm
             os: ubuntu-latest
             cmd: flutter build web --wasm --release
+          - target: web-auth
+            os: ubuntu-latest
+            cmd: flutter build web --wasm --release --dart-define-from-file=config/production.example.json
           - target: web-js
             os: ubuntu-latest
             cmd: flutter build web --release
@@ -79,26 +136,33 @@ jobs:
             cmd: flutter build windows --release
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
-      - run: flutter pub get
+      - run: flutter pub get --enforce-lockfile
       - run: ${{ matrix.cmd }}
 
   size:
     # The bundle cannot silently bloat. The README quotes a number; this keeps it true.
     needs: build
+    strategy:
+      matrix:
+        include:
+          - mode: demo
+            defines: ''
+          - mode: production-auth
+            defines: --dart-define-from-file=config/production.example.json
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
-      - run: flutter pub get
-      - run: flutter build web --wasm --release
+      - run: flutter pub get --enforce-lockfile
+      - run: flutter build web --wasm --release ${{ matrix.defines }}
       - run: node tools/strip-fonts.mjs build/web
       - name: Subset the Lucide face
         run: |
@@ -131,12 +195,12 @@ jobs:
     # Lucide font families and Flutter preloads every declared family.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v7.0.1
+      - uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
-      - run: flutter pub get
+      - run: flutter pub get --enforce-lockfile
       - run: flutter build web --wasm --release
       - name: Drop Lucide variable-weight instances
         run: node tools/strip-fonts.mjs build/web

@@ -72,52 +72,65 @@ class KiteButton extends StatelessWidget {
     // looking identical to an active one.
     final press = enabled ? onPressed : null;
     final width = expands ? double.infinity : null;
-    return switch (variant) {
-      KiteButtonVariant.primary => ShadButton(
-        onPressed: press,
-        enabled: enabled,
-        leading: leading,
-        trailing: trailing,
-        width: width,
-        child: child,
-      ),
-      KiteButtonVariant.secondary => ShadButton.secondary(
-        onPressed: press,
-        enabled: enabled,
-        leading: leading,
-        trailing: trailing,
-        width: width,
-        child: child,
-      ),
-      KiteButtonVariant.outline => ShadButton.outline(
-        onPressed: press,
-        enabled: enabled,
-        leading: leading,
-        trailing: trailing,
-        width: width,
-        child: child,
-      ),
-      KiteButtonVariant.ghost => ShadButton.ghost(
-        onPressed: press,
-        enabled: enabled,
-        leading: leading,
-        trailing: trailing,
-        width: width,
-        child: child,
-      ),
-      KiteButtonVariant.destructive => ShadButton.destructive(
-        onPressed: press,
-        enabled: enabled,
-        leading: leading,
-        trailing: trailing,
-        width: width,
-        child: child,
-      ),
-      KiteButtonVariant.link => ShadButton.link(
-        onPressed: press,
-        enabled: enabled,
-        child: child,
-      ),
-    };
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      child: switch (variant) {
+        KiteButtonVariant.primary => ShadButton(
+          onPressed: press,
+          enabled: enabled,
+          leading: leading,
+          trailing: trailing,
+          width: width,
+          height: 0,
+          expands: false,
+          child: Flexible(child: child),
+        ),
+        KiteButtonVariant.secondary => ShadButton.secondary(
+          onPressed: press,
+          enabled: enabled,
+          leading: leading,
+          trailing: trailing,
+          width: width,
+          height: 0,
+          expands: false,
+          child: Flexible(child: child),
+        ),
+        KiteButtonVariant.outline => ShadButton.outline(
+          onPressed: press,
+          enabled: enabled,
+          leading: leading,
+          trailing: trailing,
+          width: width,
+          height: 0,
+          expands: false,
+          child: Flexible(child: child),
+        ),
+        KiteButtonVariant.ghost => ShadButton.ghost(
+          onPressed: press,
+          enabled: enabled,
+          leading: leading,
+          trailing: trailing,
+          width: width,
+          height: 0,
+          expands: false,
+          child: Flexible(child: child),
+        ),
+        KiteButtonVariant.destructive => ShadButton.destructive(
+          onPressed: press,
+          enabled: enabled,
+          leading: leading,
+          trailing: trailing,
+          width: width,
+          height: 0,
+          expands: false,
+          child: Flexible(child: child),
+        ),
+        KiteButtonVariant.link => ShadButton.link(
+          onPressed: press,
+          enabled: enabled,
+          child: Flexible(child: child),
+        ),
+      },
+    );
   }
 }
