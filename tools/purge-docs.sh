@@ -11,7 +11,7 @@ SITE="$(cd "$(dirname "$0")/.." && pwd)/docs/site"
 
 [ -d "$SITE" ] || { echo "purge-docs: no build at $SITE — run tools/build-docs.py"; exit 1; }
 
-ssh hetzner sudo cf-purge-url "$BASE/"
+ssh -n -o BatchMode=yes hetzner sudo cf-purge-url "$BASE/"
 while IFS= read -r f; do
-  ssh hetzner sudo cf-purge-url "$BASE/$(basename "$f")"
+  ssh -n -o BatchMode=yes hetzner sudo cf-purge-url "$BASE/$(basename "$f")"
 done < <(find "$SITE" -type f \( -name '*.html' -o -name '*.css' \))

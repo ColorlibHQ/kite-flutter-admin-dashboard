@@ -35,6 +35,7 @@
 - Prevented cached roles, user-editable metadata, and late Auth responses from
   granting or restoring access after sign-out or role revocation.
 - Preserved bookmarked destinations and password-recovery intent across callbacks.
+- Purged all documentation pages after deployment instead of stopping after one.
 
 ### Upgrade notes
 
