@@ -67,7 +67,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: supabase/setup-cli@v3.0.1
+      - uses: supabase/setup-cli@v3.1.0
         with:
           version: 2.122.0
       - run: node tools/local-supabase.mjs start
