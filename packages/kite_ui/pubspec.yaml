@@ -25,7 +25,7 @@ dependencies:
   # The design language this layer is built on. Pre-1.0 and moving fast; the
   # whole point of this package is that consumers never name it directly.
   # Capped at 0.55.x by trina_grid, which depends on shadcn_ui ^0.55.0.
-  shadcn_ui: ^0.55.1
+  shadcn_ui: ">=0.55.1 <0.58.0"
 
   # Charts behind KiteChart / KiteSparkline / KiteDonut.
   fl_chart: ^1.3.0

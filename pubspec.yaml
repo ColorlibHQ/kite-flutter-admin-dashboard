@@ -22,7 +22,7 @@ dependencies:
     path: packages/kite_ui
 
   # Routing: nested shells, redirect guard, typed routes, deep links.
-  go_router: ^18.1.1
+  go_router: ^18.1.2
 
   # State. Codegen deliberately off — readable source matters in a template.
   flutter_riverpod: ^3.4.3
