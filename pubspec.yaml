@@ -25,7 +25,7 @@ dependencies:
   go_router: ^18.1.1
 
   # State. Codegen deliberately off — readable source matters in a template.
-  flutter_riverpod: ^3.4.3
+  flutter_riverpod: ^3.5.0
 
   # Font used by native Cupertino navigation transitions.
   cupertino_icons: ^2.0.0
