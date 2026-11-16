@@ -682,40 +682,50 @@ class _OrderRow extends StatelessWidget {
     final status = '${row['status']}';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 84,
-            child: Text(
-              '${row['reference']}',
-              style: t.small.copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
-                color: c.mutedForeground,
+      // Phone-width cards are ~290px: the avatar is the first thing to go.
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final compact = box.maxWidth < 360;
+          return Row(
+            children: [
+              SizedBox(
+                width: compact ? 68 : 84,
+                child: Text(
+                  '${row['reference']}',
+                  style: t.small.copyWith(
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    color: c.mutedForeground,
+                  ),
+                ),
               ),
-            ),
-          ),
-          KiteAvatar(name: '${row['customer']}', size: 28),
-          const SizedBox(width: KiteSpace.md),
-          Expanded(
-            child: Text(
-              '${row['customer']}',
-              style: t.p.copyWith(fontSize: 14),
-            ),
-          ),
-          KiteBadge(status, tone: _tone(status)),
-          const SizedBox(width: KiteSpace.xl),
-          SizedBox(
-            width: 92,
-            child: Text(
-              KiteFormat.money(row['total']),
-              textAlign: TextAlign.right,
-              style: t.p.copyWith(
-                fontSize: 14,
-                fontFeatures: const [FontFeature.tabularFigures()],
+              if (!compact) ...[
+                KiteAvatar(name: '${row['customer']}', size: 28),
+                const SizedBox(width: KiteSpace.md),
+              ],
+              Expanded(
+                child: Text(
+                  '${row['customer']}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: t.p.copyWith(fontSize: 14),
+                ),
               ),
-            ),
-          ),
-        ],
+              KiteBadge(status, tone: _tone(status)),
+              SizedBox(width: compact ? KiteSpace.md : KiteSpace.xl),
+              SizedBox(
+                width: compact ? 68 : 92,
+                child: Text(
+                  KiteFormat.money(row['total']),
+                  textAlign: TextAlign.right,
+                  style: t.p.copyWith(
+                    fontSize: 14,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
