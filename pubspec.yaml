@@ -1,7 +1,7 @@
 name: kite
 description: "Kite — a free, MIT-licensed Flutter admin dashboard template. Web, iOS, Android, macOS and Windows from one codebase."
 publish_to: "none"
-version: 0.2.0
+version: 0.2.1
 
 environment:
   sdk: ^3.13.1

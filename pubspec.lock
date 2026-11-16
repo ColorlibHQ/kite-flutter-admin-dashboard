@@ -467,7 +467,7 @@ packages:
       path: "packages/kite_ui"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.2.1"
   leak_tracker:
     dependency: transitive
     description:

@@ -3,7 +3,7 @@ description: >-
   Dashboard widgets for Flutter admin panels: stat grids, sparklines, donut and
   line charts, a themed data table, menus, inputs and design tokens. Built on
   shadcn_ui.
-version: 0.2.0
+version: 0.2.1
 repository: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard
 issue_tracker: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/issues
 documentation: https://docs.dashboardpack.com/kite-docs/

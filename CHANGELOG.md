@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.2.1] - 2026-11-17
+
+### Fixed
+
+- Calendar: the Agenda card never rendered on desktop widths (the schedule card
+  was laid out with unbounded width). Added a regression test.
+- Dashboard: Recent orders rows overflowed by up to 20 px at phone widths.
+
+### Changed
+
+- Pinned Flutter 3.47.9 (Dart 3.13.7) and `supabase/setup-cli` 3.2.0 in CI.
+- Refreshed dependencies: `shadcn_ui` 0.57.4 (allowed by `trina_grid` 2.4),
+  `flutter_riverpod` 3.5.0, `go_router` 18.1.4, `fl_chart` 1.3.1,
+  `material_ui` 1.11.1 and transitive updates; policy-test `pglite` 0.5.16.
+- Held: Flutter 3.50 (deprecates `package:flutter/material.dart` for
+  `material_ui`, but `shadcn_ui` still builds on the framework Material types,
+  so mixing them breaks dark mode) and `shadcn_ui` 0.58+ (`trina_grid` caps
+  it below 0.58).
+
 ## [0.2.0] - 2026-10-28
 
 ### Added

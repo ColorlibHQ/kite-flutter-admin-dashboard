@@ -18,7 +18,7 @@ dependencies:
   kite_ui:
     git:
       url: https://github.com/ColorlibHQ/kite-flutter-admin-dashboard.git
-      ref: v0.2.0
+      ref: v0.2.1
       path: packages/kite_ui
 ```
 
