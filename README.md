@@ -10,7 +10,7 @@
 
 [![CI](https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/ColorlibHQ/kite-flutter-admin-dashboard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Flutter](https://img.shields.io/badge/Flutter-3.47.8-02569B?logo=flutter)](https://docs.flutter.dev/install)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.9-02569B?logo=flutter)](https://docs.flutter.dev/install)
 
 Kite is a free, MIT-licensed **Flutter dashboard template** for teams building
 an admin panel alongside their Flutter app. Keep your models, API client, and
@@ -63,7 +63,7 @@ management, a draggable board, and a component showcase. Recorded from the app.*
 
 ## Getting started
 
-Use **Flutter 3.47.8 / Dart 3.13.7**, the versions pinned for CI. Dart ships with
+Use **Flutter 3.47.9 / Dart 3.13.7**, the versions pinned for CI. Dart ships with
 Flutter. Check your target platform's tooling with `flutter doctor`.
 
 ```bash

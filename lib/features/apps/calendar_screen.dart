@@ -85,7 +85,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                calendar,
+                // A Row hands non-flex children unbounded width, and KiteCard
+                // stretches its content: give the calendar a definite width.
+                SizedBox(width: 340, child: calendar),
                 const SizedBox(width: KiteSpace.xl),
                 Expanded(child: agenda),
               ],

@@ -1,3 +1,7 @@
+## 0.2.1 — 2026-11-17
+
+- Require `shadcn_ui` ^0.57.4 (the data grid now permits it; 0.58+ is still capped out).
+
 ## 0.2.0 — 2026-10-28
 
 - Center single-line input values and placeholders with symmetric padding at

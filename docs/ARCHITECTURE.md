@@ -86,7 +86,7 @@ non-sensitive display settings. Web sessions use SDK browser storage.
 
 ## Dependency maintenance
 
-The app and CI pin Flutter **3.47.8 / Dart 3.13.7**. `.fvmrc` provides the same
+The app and CI pin Flutter **3.47.9 / Dart 3.13.7**. `.fvmrc` provides the same
 SDK selection locally. `pubspec.yaml` declares minimum supported SDKs; the
 root lockfile records the resolved application dependencies.
 

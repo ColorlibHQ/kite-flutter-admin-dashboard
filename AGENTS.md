@@ -14,7 +14,7 @@ Kite is a Flutter admin dashboard with a local, publishable UI package.
 
 ## Build, Test, and Development Commands
 
-Use Flutter 3.47.8 to match CI; the root package requires Dart 3.13.1 or compatible.
+Use Flutter 3.47.9 to match CI; the root package requires Dart 3.13.1 or compatible.
 
 - `flutter pub get`: resolve app dependencies, including local `kite_ui`.
 - `flutter run -d chrome`: run the dashboard locally with mock data.
